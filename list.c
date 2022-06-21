@@ -12,33 +12,54 @@ List *create_list()
     return list;
 }
 
+/*Append object to the end of the list*/
 void append_node(List *list, void *data)
 {
-    Node *node, *node_ptr;
+    Node *node;
     node = (Node *)malloc(sizeof(Node));
+
     node->data = data;
+    node->next = NULL;
+
     if (list->head == NULL)
     {
         list->head = list->tail = node;
     }
     else
     {
-        node_ptr = list->tail;
-        node_ptr->priv = list->tail->priv;
         list->tail = node;
-        node_ptr->next = list->tail;
-        list->tail = NULL;
     }
     list->length++;
 }
 
+/*Remove object from the list. Note - comparing addresses of the objects*/
 void remove_node(List *list, void *data)
 {
-    return;
+    Node *nptr = list->head;
+    Node *node;
+    while (nptr != NULL)
+    {
+        if (nptr->next->data == data)
+        {
+            node = nptr->next;
+            nptr->next = node->next;
+            free(node);
+            list->length--;
+            break;
+        }
+    }
 }
 
+/*Remove the hole list*/
 void delete_list(List *list)
 {
-    return;
+    Node *current = list->head;
+    Node *next;
+    while(current != NULL)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    free(list);
 }
-

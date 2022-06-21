@@ -4,7 +4,6 @@
 typedef struct node{
     void *data;
     struct node *next;
-    struct node *priv;
 }Node;
 typedef struct list{
     Node *head;
