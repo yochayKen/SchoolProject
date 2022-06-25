@@ -1,45 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 #include "file_utils.h"
 
-/*Specified at the workbook*/
-#define NUM_OF_CHARS 100
+#define NUM_OF_CHARS 256
 
-void read_file_content(char *file_content, FILE *file)
+char *read_file_content(FILE *file)
 {
     char c;
-    int i = 1;
+    char *file_content = (char *)malloc(NUM_OF_CHARS);
+    int i = 1, chunks = 1;
     while ((c = fgetc(file)) != EOF)
     {
-        file_content[i-1] = c;
+        file_content[i - 1] = c;
         file_content[i] = '\0';
+        if (i == (chunks * NUM_OF_CHARS))
+        {
+            chunks++;
+            file_content = (char *)realloc(file_content, chunks * NUM_OF_CHARS);
+        }
         i++;
     }
+    return file_content;
 }
 
 
-/*Handling writing content to a file*/
-int handle_write_file(char *file_name, char *content)
+/*Writing content to a file*/
+int write_file(char *file_name, char *content)
 {
     return 0;
 }
 
 
-/*Handling reading the content of a file*/
-int handle_read_file(char *file_path, char **file_content)
+/*Reading the content from a file*/
+char *read_file(char *file_path)
 {
-    FILE *fp = NULL;
-    *file_content = (char *)malloc(NUM_OF_CHARS);
+    FILE *fp;
+    char *content;
     if ((fp = fopen(file_path, "r")) == NULL)
     {
         printf("Could not open file: %s\n", file_path);
-        return 1;
+        return NULL;
     }
-
-    read_file_content(*file_content, fp);
-   
+    content = read_file_content(fp);
     fclose(fp);
-    return 0;
+    return content;
 }

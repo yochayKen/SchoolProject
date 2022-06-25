@@ -9,7 +9,7 @@ int validate_num_of_arguments(int, char *);
 int main(int argc, char *argv[])
 {
     /*Aggregation of all the original file content*/
-    char *original_file_content = NULL;
+    char *original_file_content;
 
     /*Flag state which will change if something went wrong*/
     int state_flag = 0;
@@ -20,8 +20,9 @@ int main(int argc, char *argv[])
     int i;
     for (i = 1; i < argc; i++)
     {
-        handle_read_file(argv[i], &original_file_content);
-        printf("Content: %s\n", original_file_content);
+        original_file_content = read_file(argv[i]);
+        if (original_file_content != NULL)
+            printf("Content: %s\n", original_file_content);
     }
     return 0;
 }
@@ -31,7 +32,8 @@ int validate_num_of_arguments(int num_of_args, char *name_of_file)
 {
     if (num_of_args < MIN_NUM_OF_FILES)
     {
-        printf("error: insufficiant number of files\nUsage: %s <file_path_1> <file_path_2> ... <file_path_N>\n", name_of_file);
+        printf("error: insufficiant number of files\n");
+        printf("Usage: %s <file_path_1>.as <file_path_2>.as ... <file_path_N>.as\n", name_of_file);
         return 1;
     }
     return 0;
