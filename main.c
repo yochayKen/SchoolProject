@@ -36,4 +36,5 @@ int validate_num_of_arguments(int num_of_args, char *name_of_file)
         printf("Usage: %s <file_path_1> <file_path_2> ... <file_path_N>\n", name_of_file);
         return 1;
     }
+    return 0;
 }
