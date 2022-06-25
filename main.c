@@ -33,7 +33,7 @@ int validate_num_of_arguments(int num_of_args, char *name_of_file)
     if (num_of_args < MIN_NUM_OF_FILES)
     {
         printf("error: insufficiant number of files\n");
-        printf("Usage: %s <file_path_1>.as <file_path_2>.as ... <file_path_N>.as\n", name_of_file);
+        printf("Usage: %s <file_path_1> <file_path_2> ... <file_path_N>\n", name_of_file);
         return 1;
     }
 }
