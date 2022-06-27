@@ -15,7 +15,8 @@ typedef struct list{
 /* API */
 List *create_list(void);
 void append_to_list(List *, void *);
-void remove_from_list(List *, void *, int (*func_ptr)(void *, void *));
+int remove_from_list(List *, void *, int (*func_ptr)(void *, void *));
+void *search_in_list(List *, void *, int(*func_ptr)(void *, void *));
 void print_list(List *, void (*func_ptr)(void *));
 void delete_list(List *);
 
