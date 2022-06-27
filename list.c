@@ -35,10 +35,10 @@ void append_to_list(List *list, void *data)
 
 /*
 Remove 'data' type from the list. If 'data' type does not exists,
-the list will stay as it is. The function argument, MUST return int
-and will except 2 arguments of (void *) type.
+return 1. The function argument, MUST return int
+(0 or 1) and will except 2 arguments of (void *) type.
 */
-void remove_from_list(List *list, void *data, int(* func_ptr)(void *, void *))
+int remove_from_list(List *list, void *data, int(* func_ptr)(void *, void *))
 {
     Node *nptr = list->head;
     Node *priv_node;
@@ -56,7 +56,7 @@ void remove_from_list(List *list, void *data, int(* func_ptr)(void *, void *))
             }
             free(nptr);
             list->length--;
-            break;
+            return 0;
         }
         else
         {
@@ -64,7 +64,33 @@ void remove_from_list(List *list, void *data, int(* func_ptr)(void *, void *))
             nptr = nptr->next;
         }
     }
+    return 1;
 }
+
+/*
+Search 'data' type in a given list. If 'data' type does not exists,
+return NULL. The function argument, MUST return int
+(0 or 1) and will except 2 arguments of (void *) type.
+*/
+void *search_in_list(List *list, void *data, int(* func_ptr)(void *, void *))
+{
+    Node *nptr = list->head;
+    void *result = NULL;
+    while (nptr != NULL)
+    {
+        if ((*func_ptr)(nptr->data, data) == 0)
+        {
+            result = nptr->data;
+            break;
+        }
+        else
+        {
+            nptr = nptr->next;
+        }
+    }
+    return result;
+}
+
 
 /*
 Printing list elements. The function argument,

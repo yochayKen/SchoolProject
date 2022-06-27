@@ -11,6 +11,8 @@ typedef struct test{
 void print_test(void *test)
 {
     Test *t = (Test *)test;
+    if (t == NULL)
+        return;
     printf("My name is %s and im %d years old\n", t->name, t->age);
 }
 
@@ -31,6 +33,8 @@ int main()
     Test *t2;
     Test *t3;
     Test *t4;
+
+    void *test;
 
     test_list = create_list();
 
@@ -57,8 +61,15 @@ int main()
     append_to_list(test_list, t1);
     append_to_list(test_list, t2);
     append_to_list(test_list, t3);
-    append_to_list(test_list, t4);
     print_list(test_list, print_test);
+
+    printf("===== SEARCH TEST ======\n");
+    test = search_in_list(test_list, t3, check_test);
+    print_test(test);
+    test = search_in_list(test_list, t4, check_test);
+    print_test(test);
+
+    append_to_list(test_list, t4);
 
     printf("===== REMOVE TEST ======\n");
     remove_from_list(test_list, t1 ,check_test);
