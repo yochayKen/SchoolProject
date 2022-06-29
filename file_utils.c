@@ -25,23 +25,24 @@ char *read_file_content(FILE *file)
 
 
 /*Writing content to a file*/
-int write_file(char *file_name, char *content)
+int write_file(File *file)
 {
     return 0;
 }
 
 
 /*Reading the content from a file*/
-char *read_file(char *file_path)
+File *read_file(char *file_name)
 {
     FILE *fp;
-    char *content;
-    if ((fp = fopen(file_path, "r")) == NULL)
+    File *file;
+    if ((fp = fopen(file_name, "r")) == NULL)
     {
-        printf("Could not open file: %s\n", file_path);
+        printf("Could not open file: %s\n", file_name);
         return NULL;
     }
-    content = read_file_content(fp);
+    file->file_content = read_file_content(fp);
+    file->file_name = file_name;
     fclose(fp);
-    return content;
+    return file;
 }
