@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "file_utils.h"
+#include "utils.h"
 
 #define MIN_NUM_OF_FILES 2
 
@@ -15,7 +16,7 @@ int main(int argc, char *argv[])
     int state_flag = 0;
 
     if (validate_num_of_arguments(argc, argv[0]) == 1)
-        return 1;
+        return TRUE;
 
     int i;
     for (i = 1; i < argc; i++)
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
         if (original_file_content != NULL)
             printf("Content: %s\n", original_file_content);
     }
-    return 0;
+    return FALSE;
 }
 
 /*Validate number of arguments passed into the program*/
