@@ -1,8 +1,11 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-#include "list.h"
 
-List *convert_string_to_list(char *, char);
+typedef enum
+{
+        FALSE = 0,
+        TRUE = 1
+}Bool;
 
 #endif
