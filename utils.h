@@ -8,4 +8,6 @@ typedef enum
         TRUE = 1
 }Bool;
 
+typedef char *String;
+
 #endif
