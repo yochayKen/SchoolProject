@@ -2,34 +2,32 @@
 #include "file_utils.h"
 #include "handle_string.h"
 #include "utils.h"
+#include "list.h"
 
 #define MIN_NUM_OF_FILES 2
 
 int validate_num_of_arguments(int, char *);
 
+void print_list_vars(void *value)
+{
+    LineInfo *li;
+    li = (LineInfo *)value;
+    printf("%s\n", li->line_content);
+}
+
 int main(int argc, char *argv[])
 {
     /*Aggregation of all the original file content*/
-    char *original_file_content;
-    char *new_char;
-
-    /*Flag state which will change if something went wrong*/
-    int state_flag = 0;
+    File *file;
+    List *l;
 
     if (validate_num_of_arguments(argc, argv[0]) == 1)
         return TRUE;
 
-    original_file_content = read_file(argv[1]);
-    if ((new_char = get_line(original_file_content, 8)) == NULL)
-    {
-        printf("Line number does not exists\n");
-        return TRUE;
-    }
-    printf("%s\n", new_char);
-    if (is_word_exists(new_char, "mov") == TRUE)
-    {
-        printf("Found word: \"mov\"\n");
-    }
+    file = read_file(argv[1]);
+    l = convert_file_lines_to_list(file);
+    printf("Printing list:\n");
+    print_list(l, print_list_vars);
     return FALSE;
 }
 
