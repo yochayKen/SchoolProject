@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "file_utils.h"
+#include "handle_string.h"
 #include "utils.h"
 
 #define MIN_NUM_OF_FILES 2
@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 {
     /*Aggregation of all the original file content*/
     char *original_file_content;
+    char *new_char;
 
     /*Flag state which will change if something went wrong*/
     int state_flag = 0;
@@ -18,12 +19,16 @@ int main(int argc, char *argv[])
     if (validate_num_of_arguments(argc, argv[0]) == 1)
         return TRUE;
 
-    int i;
-    for (i = 1; i < argc; i++)
+    original_file_content = read_file(argv[1]);
+    if ((new_char = get_line(original_file_content, 8)) == NULL)
     {
-        original_file_content = read_file(argv[i]);
-        if (original_file_content != NULL)
-            printf("Content: %s\n", original_file_content);
+        printf("Line number does not exists\n");
+        return TRUE;
+    }
+    printf("%s\n", new_char);
+    if (is_word_exists(new_char, "mov") == TRUE)
+    {
+        printf("Found word: \"mov\"\n");
     }
     return FALSE;
 }

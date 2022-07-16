@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -ansi -pedantic
-DEPS=file_utils.h list.h
-OBJ=main.o file_utils.o list.o
+DEPS=file_utils.h list.h handle_string.h
+OBJ=main.o file_utils.o list.o handle_string.o
 
 TARGET_EXEC=assembler
 
