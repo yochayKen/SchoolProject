@@ -1,6 +1,15 @@
 #ifndef _FILE_UTILS_H_
 #define _FILE_UTILS_H_
 
-char *read_file(char *);
+/* Types*/
+typedef struct file_desc{
+    char *file_name;
+    char *file_content;
+    size_t num_of_lines;
+}File;
+
+/* API */
+File *read_file(char *);
+int write_file(File *);
 
 #endif
