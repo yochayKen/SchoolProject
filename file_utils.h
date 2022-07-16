@@ -5,10 +5,11 @@
 typedef struct file_desc{
     char *file_name;
     char *file_content;
+    size_t num_of_lines;
 }File;
 
 /* API */
-char *read_file(char *);
+File *read_file(char *);
 int write_file(File *);
 
 #endif
