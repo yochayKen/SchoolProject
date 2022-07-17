@@ -2,16 +2,34 @@
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "file_utils.h"
+#include "handle_string.h"
+#include "list.h"
 
-char *skip_white_spaces(char *str)
+LineInfo *init_line_info(char *line, unsigned int line_number)
 {
-    int i = 0;
-    while ((str[i] = ' ') || (str[i] == '\t') || (str[i] == EOF) || (str[i] == '\n'))
-        i++;
-    return str + i;
+    LineInfo *line_info = (LineInfo *) malloc(sizeof (LineInfo));
+    line_info->line_number = line_number;
+    line_info->line_content = line;
+    return line_info;
 }
 
-Bool is_word_exists(char *line, char *word)
+Bool is_start_with(const char *str, char prefix)
+{
+    if (str[0] == prefix)
+        return TRUE;
+    return FALSE;
+}
+
+Bool is_end_with(const char *str, char postfix)
+{
+    size_t str_len = strlen(str);
+    if (str[str_len] == postfix)
+        return TRUE;
+    return FALSE;
+}
+
+Bool is_word_exists(const char *line,const char *word)
 {
     char *ret;
 
@@ -21,39 +39,21 @@ Bool is_word_exists(char *line, char *word)
     return FALSE;
 }
 
-int calculate_new_line_offset(char *str, unsigned int line_number)
+List *convert_file_lines_to_list(File *file)
 {
-    unsigned int current_line = 1;
-    int i = 0;
+    List *line_list = create_list();
+    const char *current_line = file->file_content;
+    unsigned int line_number = 1;
 
-    if (current_line == line_number)
-        return i;
-
-    while (str[i] != '\0')
+    while(current_line)
     {
-        if (str[i] == '\n')
-            current_line++;
-
-        if (current_line == line_number)
-            return ++i;
-        i++;
+        const char *next_line = strchr(current_line, '\n');
+        size_t current_line_len = next_line ? (next_line - current_line) : strlen(current_line);
+        char *tmp = (char *)malloc(current_line_len + 1);
+        memcpy(tmp, current_line, current_line_len);
+        tmp[current_line_len] = '\0';
+        append_to_list(line_list, (void *) init_line_info(tmp, line_number++));
+        current_line = next_line ? (next_line + 1) : NULL;
     }
-    return -1;
-}
-
-char *get_line(char *str, unsigned int line_number)
-{
-    char *buffer;
-    int i;
-    int offset = calculate_new_line_offset(str, line_number);
-
-    if (offset == -1)
-        return NULL;
-    str = str + offset;
-
-    for (i = 0; (str[i] != '\n') && (str[i] != '\0'); i++);
-    buffer = (char *) malloc(i);
-    strncpy(buffer, str, i);
-    buffer[i] = '\0';
-    return buffer;
+    return line_list;
 }
