@@ -6,8 +6,6 @@
 #include "handle_string.h"
 #include "list.h"
 
-#define BUFFER_SIZE 81
-
 LineInfo *init_line_info(char *line, unsigned int line_number)
 {
     LineInfo *line_info = (LineInfo *) malloc(sizeof (LineInfo));
@@ -16,24 +14,22 @@ LineInfo *init_line_info(char *line, unsigned int line_number)
     return line_info;
 }
 
-char *skip_white_spaces(char *str)
+Bool is_start_with(const char *str, char prefix)
 {
-    int i = 0;
-    while ((str[i] != ' ') && (str[i] != '\t') && (str[i] != EOF))
-        i++;
-    return str + i;
-}
-
-Bool is_empty_line(char *line)
-{
-    char *ptr;
-    ptr = skip_white_spaces(line);
-    if(*ptr == '\n')
+    if (str[0] == prefix)
         return TRUE;
     return FALSE;
 }
 
-Bool is_word_exists(char *line, char *word)
+Bool is_end_with(const char *str, char postfix)
+{
+    size_t str_len = strlen(str);
+    if (str[str_len] == postfix)
+        return TRUE;
+    return FALSE;
+}
+
+Bool is_word_exists(const char *line,const char *word)
 {
     char *ret;
 
@@ -43,56 +39,21 @@ Bool is_word_exists(char *line, char *word)
     return FALSE;
 }
 
-void copy_line(const char *str, char *buffer, int i)
-{
-    char *tmp = (char *) calloc(0, sizeof(BUFFER_SIZE));
-    int j = 1;
-    while (TRUE)
-    {
-        if (str[i] == '\0')
-            break;
-        else if (str[i] == '\n')
-        {
-            tmp[j - 1] = str[i];
-            tmp[j] = '\0';
-            break;
-        }
-        i++;
-        j++;
-    }
-    strncpy(buffer, tmp, j);
-}
-
-LineInfo *get_line(const char *str, unsigned int line_number)
-{
-    char *buffer = (char *) calloc(0, sizeof(BUFFER_SIZE));
-    int i = 0, current_line = 1;
-
-    while (TRUE)
-    {
-        if (current_line == line_number)
-        {
-            copy_line(str, buffer, i);
-            printf("%s\n", buffer);
-            return init_line_info(buffer, current_line);
-        }
-        if (str[i] == '\n')
-            current_line++;
-        i++;
-    }
-}
-
 List *convert_file_lines_to_list(File *file)
 {
     List *line_list = create_list();
-    unsigned int num_of_lines = file->num_of_lines;
-    LineInfo *line_info;
-    int i;
+    const char *current_line = file->file_content;
+    unsigned int line_number = 1;
 
-    for (i = 1; i < num_of_lines; i++)
+    while(current_line)
     {
-        line_info = get_line(file->file_content, i);
-        append_to_list(line_list, (void *) line_info);
+        const char *next_line = strchr(current_line, '\n');
+        size_t current_line_len = next_line ? (next_line - current_line) : strlen(current_line);
+        char *tmp = (char *)malloc(current_line_len + 1);
+        memcpy(tmp, current_line, current_line_len);
+        tmp[current_line_len] = '\0';
+        append_to_list(line_list, (void *) init_line_info(tmp, line_number++));
+        current_line = next_line ? (next_line + 1) : NULL;
     }
     return line_list;
 }

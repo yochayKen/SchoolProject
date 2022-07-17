@@ -12,7 +12,7 @@ void print_list_vars(void *value)
 {
     LineInfo *li;
     li = (LineInfo *)value;
-    printf("%s\n", li->line_content);
+    printf("%d %s\n",li->line_number, li->line_content);
 }
 
 int main(int argc, char *argv[])

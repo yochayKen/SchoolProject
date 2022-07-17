@@ -11,9 +11,10 @@ typedef struct line_info{
 }LineInfo;
 
 /*=== API ===*/
-char *skip_white_spaces(char *);
 LineInfo *get_line(const char *, unsigned int);
-Bool is_word_exists(char *, char *);
+Bool is_start_with(const char *, char);
+Bool is_end_with(const char *, char);
+Bool is_word_exists(const char *,const char *);
 List *convert_file_lines_to_list(File *);
 
 #endif
