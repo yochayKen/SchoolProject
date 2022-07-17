@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     File *file;
     List *l;
 
-    if (validate_num_of_arguments(argc, argv[0]) == 1)
+    if (validate_num_of_arguments(argc, argv[0]) == TRUE)
         return TRUE;
 
     file = read_file(argv[1]);
@@ -38,7 +38,7 @@ int validate_num_of_arguments(int num_of_args, char *name_of_file)
     {
         printf("error: insufficiant number of files\n");
         printf("Usage: %s <file_path_1> <file_path_2> ... <file_path_N>\n", name_of_file);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
