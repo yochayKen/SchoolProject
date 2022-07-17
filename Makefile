@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -ansi -pedantic
+CFLAGS=-Wall -ansi -pedantic -g
 DEPS=file_utils.h list.h handle_string.h
 OBJ=main.o file_utils.o list.o handle_string.o
 
