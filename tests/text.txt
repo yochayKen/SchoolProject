@@ -11,6 +11,12 @@ MAIN:     mov S1.1 ,LENGTH
             inc r3
             bne END
           endmacro
+          macro shlomo
+            dec r1
+            mov #1, r5
+            inc r3
+            bne END
+            endmacro
 LOOP:     jmp END
           prn #-5
           sub r1,r4

@@ -12,6 +12,8 @@ typedef struct line_info{
 
 /*=== API ===*/
 LineInfo *get_line(const char *, unsigned int);
+char *skip_whitespaces(char *);
+char *get_nth_substring(char *, int);
 Bool is_start_with(const char *, char);
 Bool is_end_with(const char *, char);
 Bool is_word_exists(const char *,const char *);

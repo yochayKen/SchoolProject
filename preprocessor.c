@@ -8,6 +8,8 @@
 
 #define START_MACRO "macro"
 #define END_MACRO "endmacro"
+#define MACRO_NAME_ARG_POSITION 2
+#define BUFFER_SIZE 50
 
 typedef struct macro_info{
     char *macro_name;
@@ -34,9 +36,9 @@ void convert_macro_declerations(List *file_content_list, List *macros)
     return;
 }
 
-char *get_macro_name(const char *line)
+char *get_macro_name(char *line)
 {
-
+    return get_nth_substring(line, MACRO_NAME_ARG_POSITION);
 }
 
 List *search_for_macros(List *file_content_list)

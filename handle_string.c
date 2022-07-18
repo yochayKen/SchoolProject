@@ -1,10 +1,13 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
 #include "utils.h"
 #include "file_utils.h"
 #include "handle_string.h"
 #include "list.h"
+
+#define BUFFER_SIZE 64
 
 LineInfo *init_line_info(char *line, unsigned int line_number)
 {
@@ -12,6 +15,41 @@ LineInfo *init_line_info(char *line, unsigned int line_number)
     line_info->line_number = line_number;
     line_info->line_content = line;
     return line_info;
+}
+
+char *skip_whitespaces(char *str)
+{
+    int i = 0;
+    while (isspace(str[i]))
+        i++;
+    return str + i;
+}
+
+char *get_nth_substring(char *str, int n)
+{
+    int i = 0, j = 1, num_of_strs = 0;
+    char *buffer = (char *) malloc(BUFFER_SIZE);
+    while (str[i] != '\0')
+    {
+        memset(buffer, 0, BUFFER_SIZE);
+        str = skip_whitespaces(str);
+        while(!isspace(str[i]))
+        {
+            if (str[i] == '\0')
+                break;
+            buffer[j - 1] = str[i++];
+            buffer[j++] = '\0';
+        }
+        num_of_strs++;
+        if (num_of_strs == n)
+            return buffer;
+        else
+        {
+            j = 1;
+        }
+        i++;
+    }
+    return NULL;
 }
 
 Bool is_start_with(const char *str, char prefix)
