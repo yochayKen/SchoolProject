@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "list.h"
 
+static Node *current_element_addr = NULL;
+
 /*Create a generic linked list. Return a List reference.*/
 List *create_list()
 {
@@ -91,6 +93,19 @@ void *search_in_list(List *list, void *data, int(* func_ptr)(void *, void *))
     return result;
 }
 
+void *get_head_element(List *list)
+{
+    current_element_addr = list->head;
+    return current_element_addr->data;
+}
+
+void *get_next_elemet(List *list)
+{
+    current_element_addr = current_element_addr->next;
+    if (current_element_addr == NULL)
+        return NULL;
+    return current_element_addr->data;
+}
 
 /*
 Printing list elements. The function argument,

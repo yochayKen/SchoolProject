@@ -3,6 +3,7 @@
 #include "handle_string.h"
 #include "utils.h"
 #include "list.h"
+#include "preprocessor.h"
 
 #define MIN_NUM_OF_FILES 2
 
@@ -25,9 +26,7 @@ int main(int argc, char *argv[])
         return TRUE;
 
     file = read_file(argv[1]);
-    l = convert_file_lines_to_list(file);
-    printf("Printing list:\n");
-    print_list(l, print_list_vars);
+    start_preprocess_stage(file);
     return FALSE;
 }
 

@@ -4,12 +4,18 @@ MAIN:     mov S1.1 ,LENGTH
             dec r1
             mov #2, r2
           endmacro
+          prn r7
+          macro m2
+            dec r1
+            mov #1, r5
+            inc r3
+            bne END
+          endmacro
 LOOP:     jmp END
           prn #-5
           sub r1,r4
           inc k
           m1
-
           mov S1.2 ,r3
           bne LOOP
 END:      hlt
