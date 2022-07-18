@@ -99,7 +99,7 @@ void *get_head_element(List *list)
     return current_element_addr->data;
 }
 
-void *get_next_elemet(List *list)
+void *get_next_element(List *list)
 {
     current_element_addr = current_element_addr->next;
     if (current_element_addr == NULL)
