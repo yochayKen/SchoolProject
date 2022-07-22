@@ -2,14 +2,12 @@
 #include <stdlib.h>
 #include "list.h"
 
-static Node *current_element_addr = NULL;
-
 /*Create a generic linked list. Return a List reference.*/
 List *create_list()
 {
     List *list;
     list = (List *)malloc(sizeof(List));
-    list->head = list->tail = NULL;
+    list->head = list->tail = list->current_element_addr = NULL;
     list->length = 0;
     return list;
 }
@@ -95,16 +93,16 @@ void *search_in_list(List *list, void *data, int(* func_ptr)(void *, void *))
 
 void *get_head_element(List *list)
 {
-    current_element_addr = list->head;
-    return current_element_addr->data;
+    list->current_element_addr = list->head;
+    return list->current_element_addr->data;
 }
 
 void *get_next_element(List *list)
 {
-    current_element_addr = current_element_addr->next;
-    if (current_element_addr == NULL)
+    list->current_element_addr = list->current_element_addr->next;
+    if (list->current_element_addr == NULL)
         return NULL;
-    return current_element_addr->data;
+    return list->current_element_addr->data;
 }
 
 /*

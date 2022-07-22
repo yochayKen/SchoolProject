@@ -26,8 +26,24 @@ MacroInfo *create_macro_instance(char *macro_name, unsigned int line)
     return macro;
 }
 
-Bool validate_macros_decleration(List *macros)
+Bool validate_macros_decleration(List *file_content_linst, List *macros)
 {
+    LineInfo *line_info = (LineInfo *) get_head_element(file_content_linst);
+
+    while (line_info != NULL)
+    {
+        MacroInfo *macro = (MacroInfo *) get_head_element(macros);
+        while (macro != NULL)
+        {
+            if (strcmp(line_info->line_content, macro->macro_name) == 0)
+            {
+                if (macro->decleration_line > line_info->line_number)
+                    return FALSE;
+            }
+            macro = (MacroInfo *) get_next_element(macros);
+        }
+        line_info = (LineInfo *) get_next_element(file_content_linst);
+    }
     return TRUE;
 }
 
@@ -80,15 +96,13 @@ Bool start_preprocess_stage(File *file)
     List *file_content_list = convert_file_lines_to_list(file);
     List *macros = search_for_macros(file_content_list);
     if (macros == NULL)
-    {
-        file->file_content = convert_list_to_file_lines(file_content_list);
         return TRUE;
-    }
 
-    if (validate_macros_decleration(macros) == FALSE)
+    if (validate_macros_decleration(file_content_list, macros) == FALSE)
         return FALSE;
 
     convert_macro_declerations(file_content_list, macros);
+    free(file->file_content);
     file->file_content = convert_list_to_file_lines(file_content_list);
     return TRUE;
 }

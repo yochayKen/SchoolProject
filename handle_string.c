@@ -9,10 +9,11 @@
 
 #define BUFFER_SIZE 64
 
-LineInfo *init_line_info(char *line, unsigned int line_number)
+LineInfo *init_line_info(char *line, unsigned int line_number, unsigned int num_of_chars)
 {
     LineInfo *line_info = (LineInfo *) malloc(sizeof (LineInfo));
     line_info->line_number = line_number;
+    line_info->num_of_characters = num_of_chars;
     line_info->line_content = line;
     return line_info;
 }
@@ -90,8 +91,23 @@ List *convert_file_lines_to_list(File *file)
         char *tmp = (char *)malloc(current_line_len + 1);
         memcpy(tmp, current_line, current_line_len);
         tmp[current_line_len] = '\0';
-        append_to_list(line_list, (void *) init_line_info(tmp, line_number++));
+        append_to_list(line_list, (void *) init_line_info(tmp, line_number++, current_line_len));
         current_line = next_line ? (next_line + 1) : NULL;
     }
     return line_list;
+}
+
+char *convert_list_to_file_lines(List *file_content_list)
+{
+    char *buffer;
+    LineInfo *line_info = (LineInfo *) get_head_element(file_content_list);
+
+    while (line_info != NULL)
+    {
+        buffer = (char *) malloc(sizeof (line_info->num_of_characters));
+        memcpy(buffer, line_info->line_content, line_info->num_of_characters);
+        line_info = (LineInfo *) get_next_element(file_content_list);
+    }
+    delete_list(file_content_list);
+    return buffer;
 }

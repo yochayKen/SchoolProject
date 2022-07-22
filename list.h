@@ -9,6 +9,7 @@ typedef struct node{
 typedef struct list{
     Node *head;
     Node *tail;
+    Node *current_element_addr;
     unsigned int length;
 }List;
 

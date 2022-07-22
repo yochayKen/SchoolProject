@@ -7,6 +7,7 @@
 
 typedef struct line_info{
     unsigned int line_number;
+    unsigned int num_of_characters;
     char *line_content;
 }LineInfo;
 
@@ -18,5 +19,6 @@ Bool is_start_with(const char *, char);
 Bool is_end_with(const char *, char);
 Bool is_word_exists(const char *,const char *);
 List *convert_file_lines_to_list(File *);
+char *convert_list_to_file_lines(List *);
 
 #endif
