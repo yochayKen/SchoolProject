@@ -101,8 +101,32 @@ void *get_next_element(List *list)
 {
     list->current_element_addr = list->current_element_addr->next;
     if (list->current_element_addr == NULL)
+    {
+        list->current_element_addr = list->head;
         return NULL;
+    }
     return list->current_element_addr->data;
+}
+
+Node *get_current_element_addr(List *list)
+{
+    return list->current_element_addr;
+}
+
+void *check_next_element_in_list(List *list)
+{
+    Node *nptr = list->current_element_addr;
+    if (nptr->next == NULL)
+        return NULL;
+    return nptr->next->data;
+}
+
+void insert_sublist_in_list(Node *current_node, List *sub_list)
+{
+    Node *nptr = current_node;
+    Node *tmp = current_node->next;
+    nptr->next = sub_list->head;
+    sub_list->tail->next = tmp;
 }
 
 /*
