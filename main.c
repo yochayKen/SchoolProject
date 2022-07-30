@@ -9,18 +9,10 @@
 
 int validate_num_of_arguments(int, char *);
 
-void print_list_vars(void *value)
-{
-    LineInfo *li;
-    li = (LineInfo *)value;
-    printf("%d %s\n",li->line_number, li->line_content);
-}
-
 int main(int argc, char *argv[])
 {
     /*Aggregation of all the original file content*/
     File *file;
-    List *l;
 
     if (validate_num_of_arguments(argc, argv[0]) == TRUE)
         return TRUE;

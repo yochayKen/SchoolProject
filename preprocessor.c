@@ -64,7 +64,6 @@ Bool validate_macros_decleration(List *file_content_linst, List *macros)
 
 void convert_macro_declerations(List *file_content_list, List *macros)
 {
-    LineInfo *line_info = (LineInfo *) get_head_element(file_content_list);
     MacroInfo *macro_info = (MacroInfo *) get_head_element(macros);
     LineInfo *next_line_info;
     char *first_word;
@@ -86,7 +85,7 @@ void convert_macro_declerations(List *file_content_list, List *macros)
                 macro_info = (MacroInfo *) get_next_element(macros);
         }
         macro_info = (MacroInfo *) get_head_element(macros);
-        line_info = (LineInfo *) get_next_element(file_content_list);
+        next_line_info = (LineInfo *) get_next_element(file_content_list);
     }
 }
 
@@ -102,7 +101,6 @@ List *search_for_macros(List *file_content_list)
     char *macro_name;
     MacroInfo *tmp;
     LineInfo *line_info = (LineInfo *) get_head_element(file_content_list);
-    LineInfo *new_line_info = (LineInfo *) malloc(sizeof(LineInfo));
 
     while (line_info != NULL)
     {
@@ -126,6 +124,7 @@ List *search_for_macros(List *file_content_list)
             }
             else
             {
+                LineInfo *new_line_info = (LineInfo *) malloc(sizeof(LineInfo));
                 memcpy(new_line_info, line_info, sizeof (LineInfo));
                 append_to_list(tmp->command_lines, (void *) new_line_info);
             }
@@ -136,10 +135,18 @@ List *search_for_macros(List *file_content_list)
     return macros;
 }
 
+
 void print_content(void *content)
 {
     LineInfo *l = (LineInfo *)content;
     printf("%s\n", l->line_content);
+}
+
+void print_macros(void *macro)
+{
+    MacroInfo *m = (MacroInfo *)macro;
+    printf("Macro name is: %s declared at line %d\n", m->macro_name, m->decleration_line);
+    print_list(m->command_lines, print_content);
 }
 
 Bool start_preprocess_stage(File *file)
@@ -153,7 +160,7 @@ Bool start_preprocess_stage(File *file)
         return FALSE;
 
     convert_macro_declerations(file_content_list, macros);
-    print_list(file_content_list, print_content);
+    free(file->file_content);
     file->file_content = convert_list_to_file_lines(file_content_list);
     return TRUE;
 }

@@ -124,7 +124,7 @@ void *check_next_element_in_list(List *list)
 void insert_sublist_in_list(Node *current_node, List *sub_list)
 {
     Node *nptr = current_node;
-    Node *tmp = current_node->next;
+    Node *tmp = current_node->next->next;
     nptr->next = sub_list->head;
     sub_list->tail->next = tmp;
 }

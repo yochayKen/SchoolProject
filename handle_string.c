@@ -99,13 +99,18 @@ List *convert_file_lines_to_list(File *file)
 
 char *convert_list_to_file_lines(List *file_content_list)
 {
-    char *buffer;
     LineInfo *line_info = (LineInfo *) get_head_element(file_content_list);
+    unsigned int total_num_of_chars = 0, current_num_of_chars = 0;
+    char *buffer = (char *)calloc(0, sizeof(char));
+    char *tmp;
 
     while (line_info != NULL)
     {
-        buffer = (char *) malloc(sizeof (line_info->num_of_characters));
-        memcpy(buffer, line_info->line_content, line_info->num_of_characters);
+        current_num_of_chars = line_info->num_of_characters + 1;
+        total_num_of_chars += current_num_of_chars;
+        tmp = (char *)malloc(sizeof(current_num_of_chars));
+        strcpy(tmp, line_info->line_content);
+        printf("%s\n", tmp);
         line_info = (LineInfo *) get_next_element(file_content_list);
     }
     delete_list(file_content_list);
