@@ -135,20 +135,6 @@ List *search_for_macros(List *file_content_list)
     return macros;
 }
 
-
-void print_content(void *content)
-{
-    LineInfo *l = (LineInfo *)content;
-    printf("%s\n", l->line_content);
-}
-
-void print_macros(void *macro)
-{
-    MacroInfo *m = (MacroInfo *)macro;
-    printf("Macro name is: %s declared at line %d\n", m->macro_name, m->decleration_line);
-    print_list(m->command_lines, print_content);
-}
-
 Bool start_preprocess_stage(File *file)
 {
     List *file_content_list = convert_file_lines_to_list(file);

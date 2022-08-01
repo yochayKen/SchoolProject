@@ -2,3 +2,4 @@ docs/
 bin/
 a.out
 run.sh
+tests/text.txt

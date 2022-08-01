@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 
     file = read_file(argv[1]);
     start_preprocess_stage(file);
+    write_file(file);
     return FALSE;
 }
 

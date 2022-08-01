@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "file_utils.h"
 
 #define NUM_OF_CHARS 256
@@ -39,6 +40,15 @@ File *read_file_content(FILE *file, char *file_name)
 /*Writing content to a file*/
 int write_file(File *file)
 {
+    FILE *fp;
+    size_t file_size = strlen(file->file_content);
+    file->file_name = "after_preprocessor.as";
+    if ((fp = fopen(file->file_name, "w")) == NULL)
+    {
+        printf("Count not create file: %s\n", file->file_name);
+        return -1;
+    }
+    fprintf(fp, file->file_content, file_size);
     return 0;
 }
 

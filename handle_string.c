@@ -7,7 +7,7 @@
 #include "handle_string.h"
 #include "list.h"
 
-#define BUFFER_SIZE 64
+#define BUFFER_SIZE 80
 
 LineInfo *init_line_info(char *line, unsigned int line_number, unsigned int num_of_chars)
 {
@@ -45,9 +45,7 @@ char *get_nth_substring(char *str, int n)
         if (num_of_strs == n)
             return buffer;
         else
-        {
             j = 1;
-        }
         i++;
     }
     return NULL;
@@ -100,18 +98,24 @@ List *convert_file_lines_to_list(File *file)
 char *convert_list_to_file_lines(List *file_content_list)
 {
     LineInfo *line_info = (LineInfo *) get_head_element(file_content_list);
-    unsigned int total_num_of_chars = 0, current_num_of_chars = 0;
-    char *buffer = (char *)calloc(0, sizeof(char));
-    char *tmp;
+    unsigned int total_num_of_chars = line_info->num_of_characters + 1, i = 0, j = 0;
 
-    while (line_info != NULL)
+    char *buffer = (char *)malloc(line_info->num_of_characters + 1);
+
+    while (TRUE)
     {
-        current_num_of_chars = line_info->num_of_characters + 1;
-        total_num_of_chars += current_num_of_chars;
-        tmp = (char *)malloc(sizeof(current_num_of_chars));
-        strcpy(tmp, line_info->line_content);
-        printf("%s\n", tmp);
-        line_info = (LineInfo *) get_next_element(file_content_list);
+        while (line_info->line_content[j] != '\0')
+            buffer[i++] = line_info->line_content[j++];
+        buffer[i] = '\n';
+        if ((line_info = (LineInfo *) get_next_element(file_content_list)) == NULL)
+        {
+            buffer[i] = '\0';
+            break;
+        }
+        i++;
+        j = 0;
+        total_num_of_chars += line_info->num_of_characters + 1;
+        buffer = (char *)realloc(buffer, total_num_of_chars);
     }
     delete_list(file_content_list);
     return buffer;
