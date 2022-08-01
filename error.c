@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "error.h"
 
+char *current_file_name;
+
 typedef struct error{
     ErrorValue ev;
     unsigned int line_number;
@@ -18,7 +20,12 @@ void declare_an_error(ErrorValue error_value, unsigned int line_number)
     {
         if (error_table[i].ev == error_value)
         {
-            printf("Error in line [%u]: %s\n", line_number, error_table[i].error_description);
+            printf("File name: %s => Error in line [%u]: %s\n", current_file_name,  line_number, error_table[i].error_description);
         }
     }
+}
+
+void update_current_file_name(char *file_name)
+{
+    current_file_name = file_name;
 }

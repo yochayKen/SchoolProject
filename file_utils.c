@@ -49,6 +49,7 @@ int write_file(File *file)
         return -1;
     }
     fprintf(fp, file->file_content, file_size);
+    fclose(fp);
     return 0;
 }
 

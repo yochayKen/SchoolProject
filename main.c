@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "error.h"
 #include "file_utils.h"
 #include "handle_string.h"
 #include "utils.h"
@@ -8,18 +9,14 @@
 #define MIN_NUM_OF_FILES 2
 
 int validate_num_of_arguments(int, char *);
+void start_run_through_files(int ,char **);
 
 int main(int argc, char *argv[])
 {
-    /*Aggregation of all the original file content*/
-    File *file;
-
     if (validate_num_of_arguments(argc, argv[0]) == TRUE)
         return TRUE;
 
-    file = read_file(argv[1]);
-    start_preprocess_stage(file);
-    write_file(file);
+    start_run_through_files(argc, argv);
     return FALSE;
 }
 
@@ -33,4 +30,19 @@ int validate_num_of_arguments(int num_of_args, char *name_of_file)
         return TRUE;
     }
     return FALSE;
+}
+
+void start_run_through_files(int argc, char *argv[])
+{
+    int i;
+    File *current_file;
+    for (i = 1; i < argc; i++)
+    {
+        current_file = read_file(argv[i]);
+        update_current_file_name(current_file->file_name);
+        if (start_preprocess_stage(current_file) == FALSE)
+            continue;
+        else
+            write_file(current_file);
+    }
 }

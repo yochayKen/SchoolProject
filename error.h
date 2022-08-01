@@ -8,5 +8,6 @@ typedef enum error_value{
 
 /*=== API ===*/
 void declare_an_error(ErrorValue, unsigned int);
+void update_current_file_name(char *);
 
 #endif
