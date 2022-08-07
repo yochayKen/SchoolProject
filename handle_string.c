@@ -8,6 +8,8 @@
 #include "list.h"
 
 #define BUFFER_SIZE 80
+#define EXTENSION_CHARS 3
+#define EXTENSION "as"
 
 LineInfo *init_line_info(char *line, unsigned int line_number, unsigned int num_of_chars)
 {
@@ -16,6 +18,26 @@ LineInfo *init_line_info(char *line, unsigned int line_number, unsigned int num_
     line_info->num_of_characters = num_of_chars;
     line_info->line_content = line;
     return line_info;
+}
+
+Bool check_file_extension(char *file_name)
+{
+    char buffer[EXTENSION_CHARS];
+    int j, i = 0;
+    while (file_name[i] != '\0')
+    {
+        if (file_name[i] == '.')
+        {
+            for (j = 0; j < EXTENSION_CHARS; j++)
+                buffer[j] = file_name[++i];
+            buffer[++j] = '\0';
+            break;
+        }
+        i++;
+    }
+    if (strcmp(EXTENSION, buffer) == 0)
+        return TRUE;
+    return FALSE;
 }
 
 char *skip_whitespaces(char *str)
@@ -29,26 +51,47 @@ char *skip_whitespaces(char *str)
 char *get_nth_substring(char *str, int n)
 {
     int i = 0, j = 1, num_of_strs = 0;
+    Bool end_of_str = FALSE;
     char *buffer = (char *) malloc(BUFFER_SIZE);
-    while (str[i] != '\0')
+    while (TRUE)
     {
         memset(buffer, 0, BUFFER_SIZE);
-        str = skip_whitespaces(str);
-        while(!isspace(str[i]))
+        if (!isspace(str[i]))
         {
-            if (str[i] == '\0')
-                break;
-            buffer[j - 1] = str[i++];
-            buffer[j++] = '\0';
+            while(TRUE)
+            {
+                if (str[i] == '\0' || str[i] == ',')
+                {
+                    end_of_str = TRUE;
+                    break;
+                }
+                if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n')
+                    break;
+                buffer[j - 1] = str[i++];
+                buffer[j++] = '\0';
+            }
+            num_of_strs++;
         }
-        num_of_strs++;
         if (num_of_strs == n)
             return buffer;
         else
             j = 1;
+        if (end_of_str == TRUE)
+            break;
         i++;
     }
     return NULL;
+}
+
+void remove_last_char(char *str)
+{
+    int str_len = strlen(str);
+    str[str_len - 1] = '\0';
+}
+
+char get_first_char(char *str)
+{
+    return str[0];
 }
 
 Bool is_start_with(const char *str, char prefix)
@@ -61,7 +104,7 @@ Bool is_start_with(const char *str, char prefix)
 Bool is_end_with(const char *str, char postfix)
 {
     size_t str_len = strlen(str);
-    if (str[str_len] == postfix)
+    if (str[str_len - 1] == postfix)
         return TRUE;
     return FALSE;
 }

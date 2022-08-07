@@ -42,10 +42,9 @@ int write_file(File *file)
 {
     FILE *fp;
     size_t file_size = strlen(file->file_content);
-    file->file_name = "after_preprocessor.as";
     if ((fp = fopen(file->file_name, "w")) == NULL)
     {
-        printf("Count not create file: %s\n", file->file_name);
+        printf("Could not create file: %s\n", file->file_name);
         return -1;
     }
     fprintf(fp, file->file_content, file_size);

@@ -3,7 +3,9 @@
 
 typedef enum error_value{
     INVALID_MACRO_DECLERATION,
-    NONE
+    INVALID_SYMBOL_DECLERATION,
+    SYMBOL_ALREADY_DECLARED,
+    UNKNOWN_FILE_EXTENSION
 }ErrorValue;
 
 /*=== API ===*/

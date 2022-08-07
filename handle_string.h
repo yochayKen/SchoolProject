@@ -13,8 +13,11 @@ typedef struct line_info{
 
 /*=== API ===*/
 LineInfo *get_line(const char *, unsigned int);
+Bool check_file_extension(char *);
 char *skip_whitespaces(char *);
 char *get_nth_substring(char *, int);
+void remove_last_char(char *);
+char get_first_char(char *);
 Bool is_start_with(const char *, char);
 Bool is_end_with(const char *, char);
 Bool is_word_exists(const char *,const char *);

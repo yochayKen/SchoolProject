@@ -129,6 +129,19 @@ void insert_sublist_in_list(Node *current_node, List *sub_list)
     sub_list->tail->next = tmp;
 }
 
+int count_list(List *list)
+{
+    Node *nptr = list->head;
+    int num_of_lines = 0;
+
+    while (nptr != NULL)
+    {
+        num_of_lines++;
+        nptr = nptr->next;
+    }
+    return num_of_lines;
+}
+
 /*
 Printing list elements. The function argument,
 MUST return void and will except 1 (void *) argument.

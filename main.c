@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "list.h"
 #include "preprocessor.h"
+#include "first_stage.h"
 
 #define MIN_NUM_OF_FILES 2
 
@@ -36,13 +37,22 @@ void start_run_through_files(int argc, char *argv[])
 {
     int i;
     File *current_file;
+    
     for (i = 1; i < argc; i++)
     {
         current_file = read_file(argv[i]);
         update_current_file_name(current_file->file_name);
+        if (check_file_extension(current_file->file_name) == FALSE)
+        {
+            declare_an_error(UNKNOWN_FILE_EXTENSION, 0);
+            continue;
+        }
         if (start_preprocess_stage(current_file) == FALSE)
             continue;
         else
             write_file(current_file);
+
+        if (start_first_stage(current_file) == FALSE)
+            continue;
     }
 }

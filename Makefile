@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-Wall -ansi -pedantic -g
-DEPS=file_utils.h list.h handle_string.h preprocessor.h error.h
-OBJ=main.o file_utils.o list.o handle_string.o preprocessor.o error.o
+CFLAGS=-Wall -ansi -pedantic
+DEPS=file_utils.h list.h handle_string.h preprocessor.h error.h first_stage.h
+OBJ=main.o file_utils.o list.o handle_string.o preprocessor.o error.o first_stage.o
 
 TARGET_EXEC=assembler
 

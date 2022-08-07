@@ -22,6 +22,7 @@ void *get_next_element(List *);
 void *get_head_element(List *);
 void *check_next_element_in_list(List *);
 void insert_sublist_in_list(Node *, List *);
+int count_list(List *);
 void print_list(List *, void (*func_ptr)(void *));
 void delete_list(List *);
 
