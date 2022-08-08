@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
+#include "utils.h"
 
 /*Create a generic linked list. Return a List reference.*/
 List *create_list()
@@ -140,6 +141,13 @@ int count_list(List *list)
         nptr = nptr->next;
     }
     return num_of_lines;
+}
+
+Bool is_list_empty(List *list)
+{
+    if (list->head == NULL)
+        return TRUE;
+    return FALSE;
 }
 
 /*

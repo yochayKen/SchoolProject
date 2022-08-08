@@ -60,12 +60,12 @@ char *get_nth_substring(char *str, int n)
         {
             while(TRUE)
             {
-                if (str[i] == '\0' || str[i] == ',')
+                if (str[i] == '\0')
                 {
                     end_of_str = TRUE;
                     break;
                 }
-                if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n')
+                if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == ',')
                     break;
                 buffer[j - 1] = str[i++];
                 buffer[j++] = '\0';

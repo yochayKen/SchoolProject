@@ -1,6 +1,7 @@
 #ifndef _LIST_H_
 #define _LIST_H_
 
+#include "utils.h"
 /* Types*/
 typedef struct node{
     void *data;
@@ -23,6 +24,7 @@ void *get_head_element(List *);
 void *check_next_element_in_list(List *);
 void insert_sublist_in_list(Node *, List *);
 int count_list(List *);
+Bool is_list_empty(List *);
 void print_list(List *, void (*func_ptr)(void *));
 void delete_list(List *);
 

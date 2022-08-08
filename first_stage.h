@@ -5,19 +5,20 @@
 #include "file_utils.h"
 
 typedef enum{
+    ENTRY,
+    EXTERN,
     DATA,
     STRING,
     STRUCT,
-    EXTERNAL,
-    INTERNAL,
-    NONE
-}DataStructureType;
+    INSTRUCTION,
+    UNKNOWN
+}FieldType;
 
 typedef struct symbol
 {
     char *symbol_name;
-    DataStructureType data_type;
-    unsigned int decleration_line;
+    unsigned int declared_address;
+    FieldType type;
 }Symbol;
 
 Bool start_first_stage(File *);

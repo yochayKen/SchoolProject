@@ -1,6 +1,8 @@
+;this is a commant
 .extern   W
 .extern   BLA
-.intern   K
+.entry   K
+T:        .entry
 MAIN:     mov S1.1 ,LENGTH
           add r2,STR
           prn r7
