@@ -12,11 +12,19 @@ typedef struct error{
 }Error;
 
 static const Error error_table[] = {
-    { INVALID_MACRO_DECLERATION, "Macro should be defined before use" },
-    { INVALID_SYMBOL_DECLERATION, "Invalid symbol decleration" },
-    { SYMBOL_ALREADY_DECLARED, "Symbol has been already declared"},
-    { UNKNOWN_FILE_EXTENSION, "Unknown file extension. Should end with '.as'"},
-    {UNKNOWN_DECLARED_STR, "Unknown word has been deteced"}
+    {INVALID_MACRO_DECLERATION, "Macro should be defined before use" },
+    {INVALID_SYMBOL_DECLERATION, "Invalid symbol decleration" },
+    {SYMBOL_ALREADY_DECLARED, "Symbol has been already declared"},
+    {UNKNOWN_FILE_EXTENSION, "Unknown file extension. Should end with '.as'"},
+    {UNKNOWN_DECLARED_STR, "Unknown word has been deteced"},
+    {DATA_STRUCT_DECLARED_WITH_NO_NUMBER, "Data structure \".data\" has been daclared with invalid argument"},
+    {UNKNOWN_DATA_STRUCT_TYPE, "Could not identify the data struct"},
+    {ERROR_IN_STRING_DECLARATION, "String declaration missing quotation mark"},
+    {ERROR_IN_STRUCT_DECLARATION, "Struct declaration is invalid"},
+    {COULD_NOT_FIND_INSTRUCTION, "Could not find instruction name"},
+    {FOUND_ARGS_FOR_NONE_INST_ARG, "The instruction should not get arguments"},
+    {UNSUPPORTED_ADDR_METHOD, "Unsupported addressing method"},
+    {NO_COMMA_FOUND, "No comma found in data structure"}
 };
 
 void declare_an_error(ErrorValue error_value, unsigned int line_number)

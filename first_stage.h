@@ -14,10 +14,12 @@ typedef enum{
     UNKNOWN
 }FieldType;
 
+typedef unsigned int MemoryCell;
+
 typedef struct symbol
 {
     char *symbol_name;
-    unsigned int declared_address;
+    MemoryCell declared_address;
     FieldType type;
 }Symbol;
 

@@ -2,7 +2,6 @@
 .extern   W
 .extern   BLA
 .entry   K
-T:        .entry
 MAIN:     mov S1.1 ,LENGTH
           add r2,STR
           prn r7
@@ -20,6 +19,6 @@ STR:      .string "abcdef"
           mov #2, r2
           prn r5
           mov #-2, r3
-LENGTH:   .data 6,-9,15
+LENGTH:   .data 6, -9, 15
 K:        .data 22
 S1:       .struct 8, "ab"

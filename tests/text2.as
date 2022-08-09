@@ -2,7 +2,6 @@
 .extern   W
 .extern   BLA
 .entry   K
-T:        .entry
 MAIN:     mov S1.1 ,LENGTH
           add r2,STR
           macro m2
@@ -26,6 +25,6 @@ LOOP:     jmp END
 END:      hlt
 STR:      .string "abcdef"
           m1
-LENGTH:   .data 6,-9,15
+LENGTH:   .data 6, -9, 15
 K:        .data 22
 S1:       .struct 8, "ab"

@@ -60,12 +60,12 @@ char *get_nth_substring(char *str, int n)
         {
             while(TRUE)
             {
-                if (str[i] == '\0')
+                if (str[i] == '\0' || str[i] == '\n')
                 {
                     end_of_str = TRUE;
                     break;
                 }
-                if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == ',')
+                if (str[i] == ' ' || str[i] == '\t' || str[i] == ',')
                     break;
                 buffer[j - 1] = str[i++];
                 buffer[j++] = '\0';
@@ -87,6 +87,12 @@ void remove_last_char(char *str)
 {
     int str_len = strlen(str);
     str[str_len - 1] = '\0';
+}
+
+char get_last_char(char *str)
+{
+    int str_len = strlen(str);
+    return str[str_len - 1];
 }
 
 char get_first_char(char *str)

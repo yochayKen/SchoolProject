@@ -3,7 +3,6 @@
 #include "first_stage.h"
 
 typedef enum{
-    INSTRUCTION_T,
     REGISTER_T,
     STRUCT_T
 }TableType;
@@ -25,17 +24,17 @@ static const Encoder encoding_table[] = {
     {'s', 28}, {'t', 29}, {'u', 30}, {'v', 31}
 };
 
+static InstructionType instruction_table[] = {
+    {"mov", 0, 2, 0xf, 0xe}, {"cmp", 1, 2, 0xf, 0xf}, {"add", 2, 2, 0xf, 0xe}, {"sub", 3, 2, 0xf, 0xe},
+    {"not", 4, 1, 0x0, 0xe}, {"clr", 5, 1, 0x0, 0xe}, {"lea", 6, 2, 0x6, 0xe}, {"inc", 7, 1, 0x0, 0xe},
+    {"dec", 8, 1, 0x0, 0xe}, {"jmp", 9, 1, 0x0, 0xe}, {"bne", 10, 1, 0x0, 0xe}, {"get", 11, 1, 0x0, 0xe},
+    {"prn", 12, 1, 0x0, 0xf}, {"jsr", 13, 1, 0x0, 0xe}, {"rts", 14, 0, 0x0, 0x0}, {"hlt", 15, 0, 0x0, 0x0}
+};
+
 typedef struct variable_type{
     char *variable_name;
     unsigned int value: 4;
 }VarType;
-
-static VarType instruction_table[] = {
-    {"mov", 0}, {"cmp", 1}, {"add", 2}, {"sub", 3},
-    {"not", 4}, {"clr", 5}, {"lea", 6}, {"inc", 7},
-    {"dec", 8}, {"jmp", 9}, {"bne", 10}, {"get", 11},
-    {"prn", 12}, {"jsr", 13}, {"rts", 14}, {"hlt", 15}
-};
 
 static VarType register_table[] = {
     {"r0", 0}, {"r1", 1}, {"r2", 2}, {"r3", 3},
@@ -65,10 +64,6 @@ int search_in_table(char *str, TableType type)
 
     switch (type)
     {
-    case INSTRUCTION_T:
-        table_size = (sizeof(instruction_table)/sizeof(VarType));
-        table = instruction_table;
-        break;
     case REGISTER_T:
         table_size = (sizeof(register_table)/sizeof(VarType));
         table = register_table;
@@ -89,7 +84,27 @@ int search_in_table(char *str, TableType type)
 
 int get_instruction_value(char *str)
 {
-    return search_in_table(str, INSTRUCTION_T);
+    int i;
+    for (i = 0; i < (sizeof(instruction_table)/sizeof(InstructionType)); i++)
+    {
+        if (strcmp(instruction_table[i].instruction_name, str) == 0)
+            return instruction_table[i].value;
+    }
+    return -1;
+}
+
+Bool get_instruction(char *str, InstructionType *it)
+{
+    int i;
+    for (i = 0; i < (sizeof(instruction_table)/sizeof(InstructionType)); i++)
+    {
+        if (strcmp(instruction_table[i].instruction_name, str) == 0)
+        {
+            memcpy(it, &instruction_table[i], sizeof(InstructionType));
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 int get_register_value(char *str)
