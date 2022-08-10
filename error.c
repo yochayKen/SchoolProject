@@ -55,7 +55,7 @@ ErrorValue get_error_type()
     return error_value;
 }
 
-void set_current_file_name(char *file_name)
+void update_current_file_name(char *file_name)
 {
     current_file_name = file_name;
 }

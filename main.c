@@ -41,7 +41,7 @@ void start_run_through_files(int argc, char *argv[])
     for (i = 1; i < argc; i++)
     {
         current_file = read_file(argv[i]);
-        set_current_file_name(current_file->file_name);
+        update_current_file_name(current_file->file_name);
         if (check_file_extension(current_file->file_name) == FALSE)
         {
             declare_an_error(UNKNOWN_FILE_EXTENSION, 0);
@@ -51,7 +51,7 @@ void start_run_through_files(int argc, char *argv[])
             continue;
         else
             write_file(current_file);
-        set_current_file_name(current_file->file_name);
+        update_current_file_name(current_file->file_name);
         if (start_first_stage(current_file) == FALSE)
             continue;
     }

@@ -2,7 +2,7 @@
 .extern   W
 .extern   BLA
 .entry   K
-MAIN:     mov S1.1 ,LENGTH
+MAIN:     mov S1.1, LENGTH
           add r2,STR
           macro m2
           prn #7

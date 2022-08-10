@@ -23,6 +23,7 @@
 #define QUOTATION_MARK '"'
 #define HASH '#'
 #define DOT '.'
+#define TOKENS " ,\n\0\t\r"
 
 static MemoryCell data_counter = 0;
 static MemoryCell instruction_counter = 0;
@@ -47,7 +48,7 @@ typedef enum{
 typedef enum{
     SRC,
     DST
-}ArgPos;
+}ArgType;
 
 int is_a_struct(char *str)
 {
@@ -83,39 +84,169 @@ void update_instruction_code(unsigned int *instruction_code, unsigned int instru
     *instruction_code |= instruction_value;
 }
 
-Bool validate_address_method(unsigned int address_method_options, AddrMethod method)
+void validate_address_method_support(unsigned int address_method_options, AddrMethod method)
 {
-    if (address_method_options & method == 1)
+    if ((address_method_options & method) == 0)
+        set_error_type(UNSUPPORTED_ADDR_METHOD);
+}
+
+Symbol *create_symbol_type(char *symbol_name, unsigned int address, FieldType type)
+{
+    Symbol *s = (Symbol *)malloc(sizeof(Symbol));
+    s->symbol_name = symbol_name;
+    s->declared_address = address;
+    s->type = type;
+    return s;
+}
+
+Bool is_record_declaration(char *str)
+{
+    if (strchr(str, DOT) != NULL && is_start_with(str, DOT) == FALSE)
         return TRUE;
     return FALSE;
 }
 
-Bool check_for_comma(char *str, char *content, int pos)
+void check_for_comma(char *content, char *str)
 {
-    return TRUE;
+    int str_len = strlen(content) + 1;
+    char *tmp = (char *)malloc(str_len);
+
+    strcpy(tmp, content);
+    tmp = strtok(tmp, " \n\t\r");
+    while (TRUE)
+    {
+        tmp = strtok(NULL, " \n\t\r");
+        if (strcmp(tmp, str) == 0)
+        {
+            if ((tmp = strtok(NULL, " \n\t\r")) == COMMA)
+                return;
+            else
+            {
+                set_error_type(NO_COMMA_FOUND);
+                return;
+            }
+        }
+        else if (tmp == NULL)
+            return;
+    }
 }
 
-void handle_instruction_type(char *content, int pos)
+int check_method_type(char *arg, unsigned int type)
 {
-    char *str;
-    char *instruction;
+    if (is_start_with(arg, HASH) == TRUE)
+    {
+        validate_address_method_support(type, IMMEDIATE_ADDR);
+        return IMMEDIATE;
+    }
+    else if (get_register_value(arg) != -1)
+    {
+        validate_address_method_support(type, REGISTER_ADDR);
+        return REGISTER;
+    }
+    else if (is_record_declaration(arg) == TRUE)
+    {
+        validate_address_method_support(type, RECORD_ADDR);
+        return RECORD;
+    }
+    else
+    {
+        validate_address_method_support(type, DIRECT_ADDR);
+        return DIRECT;
+    }
+}
 
-    unsigned int num_of_args = 0;
+void create_off_to_instruction_pointer(char *src, char *dst)
+{
+    int src_val = -1;
+    int dst_val;
+    if (src != NULL)
+    {
+        src_val = check_method_type(src, 0xf);
+    }
+    dst_val = check_method_type(dst, 0xf);
+    switch (dst_val)
+    {
+    case REGISTER:
+        if (src_val == REGISTER)
+            instruction_counter++;
+        else if (src_val == RECORD)
+            instruction_counter+=3;
+        else if (src_val == DIRECT || src_val == IMMEDIATE)
+            instruction_counter+=2;
+        else
+            instruction_counter++;
+        break;
+    case IMMEDIATE:
+        if (src_val == RECORD)
+            instruction_counter+=3;
+        else if (src_val == REGISTER || src_val == DIRECT)
+            instruction_counter+=2;
+        else
+            instruction_counter++;
+        break;
+    case DIRECT:
+        if (src_val == RECORD)
+            instruction_counter+=3;
+        else if (src_val == REGISTER || src_val == IMMEDIATE)
+            instruction_counter+=2;
+        else
+            instruction_counter++;
+        break;
+    default:
+        if (src_val == RECORD)
+            instruction_counter+=4;
+        else if (src_val == REGISTER || src_val == IMMEDIATE || src_val == DIRECT)
+            instruction_counter+=3;
+        else
+            instruction_counter+=2;
+        break;
+    }
+}
+
+void handle_instruction_type(char *content)
+{
+    char *instruction;
+    char *src = NULL;
+    char *dst = NULL;
+
     unsigned int instruction_code = 0;
+    unsigned int content_len = strlen(content);
+
+    int instruction_value;
+
     InstructionType *it = (InstructionType *)malloc(sizeof(InstructionType));
 
-    instruction = get_nth_substring(content, pos);
+    char *tmp = (char *)malloc(content_len + 1);
+    strcpy(tmp, content);
+    
+    instruction = strtok(tmp, TOKENS);
+    if (is_end_with(instruction, SYMBOL_TERMINATE_CHARACTER) == TRUE)
+        instruction = strtok(NULL, TOKENS);
+    
     if (get_instruction(instruction, it) == FALSE)
     {
         set_error_type(COULD_NOT_FIND_INSTRUCTION);
         return;
     }
     update_instruction_code(&instruction_code, it->value, INSTRUCTION_SHIFTS);
-
     if (it->max_args == 0)
         return;
-    
-    str = get_nth_substring(content, ++pos);
+
+    if (it->addr_src_support != 0)
+    {
+        src = strtok(NULL, TOKENS);
+        instruction_value = check_method_type(src, it->addr_src_support);
+        update_instruction_code(&instruction_code, instruction_value, SRC_ARG_SHIFT);
+        check_for_comma(content, src);
+        if (get_error() == TRUE)
+            return;
+    }
+    dst = strtok(NULL, TOKENS);
+    instruction_value = check_method_type(dst, it->addr_dst_support);
+    update_instruction_code(&instruction_code, instruction_value, DST_ARG_SHIFT);
+
+    add_instruction_to_memory(instruction_code);
+    create_off_to_instruction_pointer(src, dst);
 }
 
 void handle_string_structure_type(FieldType type, char *content, int pos)
@@ -129,14 +260,15 @@ void handle_string_structure_type(FieldType type, char *content, int pos)
             set_error_type(ERROR_IN_STRING_DECLARATION);
             return;
         }
-        *str++;
-        while(*str != '\0')
+        str++;
+        while(str != '\0')
         {
             if (*str == QUOTATION_MARK)
                 break;
             add_char_to_memory(*str);
-            *str++;
+            str++;
         }
+        add_char_to_memory('\0');
         if (type == STRUCT)
         {
             if (get_error() == TRUE)
@@ -159,11 +291,6 @@ void handle_data_structure_type(FieldType type, char *content, int pos)
             return;
         }
         add_number_to_memory(num);
-        if (check_for_comma(str, content, pos) == FALSE)
-        {
-            set_error_type(NO_COMMA_FOUND);
-            return;
-        }
         if (type == STRUCT)
         {
             if (get_error() == TRUE)
@@ -171,6 +298,31 @@ void handle_data_structure_type(FieldType type, char *content, int pos)
             return;
         }
     }
+}
+
+void add_symbol_to_table(Symbol *symbol, List *symbol_table)
+{
+    Symbol *tmp;
+    Symbol *current_symbol = (Symbol *)malloc(sizeof(Symbol));
+
+    if (is_list_empty(symbol_table) == TRUE)
+    {
+        append_to_list(symbol_table, (void *)symbol);
+        return;
+    }
+    
+    tmp = (Symbol *)get_head_element(symbol_table);
+    while (tmp != NULL)
+    {
+        if(strcmp(tmp->symbol_name, symbol->symbol_name) == 0)
+        {
+            set_error_type(SYMBOL_ALREADY_DECLARED);
+            return;
+        }
+        tmp = (Symbol *)get_next_element(symbol_table);
+    }
+    memcpy(current_symbol, symbol, sizeof(Symbol));
+    append_to_list(symbol_table, (void *)current_symbol);
 }
 
 void handle_struct_structure_type(char *content, int pos)
@@ -192,7 +344,14 @@ void handle_struct_structure_type(char *content, int pos)
     }
 }
 
-void handle_struct_type(FieldType type, char *content, int pos)
+void handle_extern_symbol(char *content, int pos, List *symbol_table)
+{
+    char *str = get_nth_substring(content, ++pos);
+    Symbol *ext_symbol = create_symbol_type(str, 0, EXTERN);
+    add_symbol_to_table(ext_symbol, symbol_table);
+}
+
+void handle_struct_type(FieldType type, char *content, int pos, List *symbol_table)
 {
     switch (type)
     {
@@ -206,10 +365,9 @@ void handle_struct_type(FieldType type, char *content, int pos)
         handle_struct_structure_type(content, pos);
         break;
     case EXTERN:
-        /* handle_extern_structure_type(content, pos); */
+        handle_extern_symbol(content, pos, symbol_table);
         break;
     case ENTRY:
-        /* handle_entry_structure_type(content, pos); */
         break;
     default:
         set_error_type(UNKNOWN_DATA_STRUCT_TYPE);
@@ -244,45 +402,10 @@ void update_symbol_address(Symbol *symbol, int type, List *symbol_table)
     }
 }
 
-Symbol *create_symbol_type(char *symbol_name, unsigned int address, FieldType type)
-{
-    Symbol *s = (Symbol *)malloc(sizeof(Symbol));
-    s->symbol_name = symbol_name;
-    s->declared_address = address;
-    s->type = type;
-    return s;
-}
-
 void remove_symbol_from_table(Symbol *symbol, List *symbol_table)
 {
     remove_from_list(symbol_table, (void *)symbol, check_symbol_name);
 }
-
-void add_symbol_to_table(Symbol *symbol, List *symbol_table)
-{
-    Symbol *tmp;
-    Symbol *current_symbol = (Symbol *)malloc(sizeof(Symbol));
-
-    if (is_list_empty(symbol_table) == TRUE)
-    {
-        append_to_list(symbol_table, (void *)symbol);
-        return;
-    }
-    
-    tmp = (Symbol *)get_head_element(symbol_table);
-    while (tmp != NULL)
-    {
-        if(strcmp(tmp->symbol_name, symbol->symbol_name) == 0)
-        {
-            set_error_type(SYMBOL_ALREADY_DECLARED);
-            return;
-        }
-        tmp = (Symbol *)get_next_element(symbol_table);
-    }
-    memcpy(current_symbol, symbol, sizeof(Symbol));
-    append_to_list(symbol_table, (void *)current_symbol);
-}
-
 
 Bool validate_symbol(char *symbol_name)
 {
@@ -343,32 +466,18 @@ void read_line(char *content, List *symbol_table)
             else
                 update_symbol_address(symbol, struct_type, symbol_table);
         }
-        handle_struct_type(struct_type, content, str_pos);
+        handle_struct_type(struct_type, content, str_pos, symbol_table);
     }
     else if ((instruction_type = is_an_instruction(str)) != -1)
     {
+        
         if (is_symbol == TRUE)
             update_symbol_address(symbol, INSTRUCTION, symbol_table);
-        handle_instruction_type(content, str_pos);
+        handle_instruction_type(content);
     }
     else
         set_error_type(UNKNOWN_DECLARED_STR);
     return;
-}
-
-/*For test*/
-void print(void *s)
-{
-    Symbol *sm = (Symbol *)s;
-    printf("Label: %s, Address: %d, Type: %d\n", sm->symbol_name, sm->declared_address, sm->type);
-}
-
-void print_memory()
-{
-    int i;
-    for (i = 0; data_storage[i + 1] != '\0'; i++)
-        printf("%d, ", data_storage[i]);
-    printf("%d\n", data_storage[i]);
 }
 
 Bool start_first_stage(File *file)
@@ -391,7 +500,6 @@ Bool start_first_stage(File *file)
         }
         line_number++;
     }
-    print_list(symbol_table, print);
     fclose(fp);
     return TRUE;
 }

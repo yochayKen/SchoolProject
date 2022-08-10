@@ -2,7 +2,7 @@
 .extern   W
 .extern   BLA
 .entry   K
-MAIN:     mov S1.1 ,LENGTH
+MAIN:     mov S1.1, LENGTH
           add r2,STR
           prn r7
 LOOP:     jmp END

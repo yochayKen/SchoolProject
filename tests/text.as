@@ -1,6 +1,5 @@
 MAIN:     mov S1.1 ,LENGTH
           add r2,STR
-          m1
           macro m2
           prn #7
           inc r1
