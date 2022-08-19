@@ -89,6 +89,11 @@ void remove_last_char(char *str)
     str[str_len - 1] = '\0';
 }
 
+void remove_first_char(char *str)
+{
+    str = str++;
+}
+
 char get_last_char(char *str)
 {
     int str_len = strlen(str);

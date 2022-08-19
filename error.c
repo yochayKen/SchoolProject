@@ -24,7 +24,8 @@ static const Error error_table[] = {
     {COULD_NOT_FIND_INSTRUCTION, "Could not find instruction name"},
     {FOUND_ARGS_FOR_NONE_INST_ARG, "The instruction should not get arguments"},
     {UNSUPPORTED_ADDR_METHOD, "Unsupported addressing method"},
-    {NO_COMMA_FOUND, "No comma found in data structure"}
+    {TO_MANY_ARGUEMNTS, "To many arguments has been added to instruction"},
+    {NO_COMMA_FOUND, "Missimg comma between commands"}
 };
 
 void declare_an_error(ErrorValue error_value, unsigned int line_number)

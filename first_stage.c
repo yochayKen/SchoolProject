@@ -9,21 +9,13 @@
 #include "error.h"
 #include "utils.h"
 
-#define LINE_BUFFER_SIZE 80
 #define BUFFER_SIZE 32
 #define STORAGE_SPACE 1024
 #define SYMBOL_DECLARATION_POS 1
 #define INSTRUCTION_SHIFTS 6
 #define SRC_ARG_SHIFT 4
 #define DST_ARG_SHIFT 2
-
-#define SYMBOL_TERMINATE_CHARACTER ':'
-#define SEMI_COLON ';'
-#define COMMA ','
-#define QUOTATION_MARK '"'
-#define HASH '#'
-#define DOT '.'
-#define TOKENS " ,\n\0\t\r"
+#define ADDR_OFFSET 100
 
 static MemoryCell data_counter = 0;
 static MemoryCell instruction_counter = 0;
@@ -39,16 +31,24 @@ typedef enum{
 }AddrMethod;
 
 typedef enum{
-    IMMEDIATE,
-    DIRECT,
-    RECORD,
-    REGISTER
-}Method;
-
-typedef enum{
     SRC,
     DST
 }ArgType;
+
+MemoryCell get_data_counter()
+{
+    return data_counter;
+}
+
+MemoryCell *get_data_storage()
+{
+    return data_storage;
+}
+
+MemoryCell *get_instruction_storage()
+{
+    return instruction_storage;
+}
 
 int is_a_struct(char *str)
 {
@@ -108,27 +108,45 @@ Bool is_record_declaration(char *str)
 
 void check_for_comma(char *content, char *str)
 {
-    int str_len = strlen(content) + 1;
-    char *tmp = (char *)malloc(str_len);
+    char *buffer = (char *)malloc(BUFFER_SIZE);
+    int line_length = strlen(content);
+    Bool found_str = FALSE;
 
-    strcpy(tmp, content);
-    tmp = strtok(tmp, " \n\t\r");
-    while (TRUE)
+    int i = 0, j = 1;
+    while (i < line_length)
     {
-        tmp = strtok(NULL, " \n\t\r");
-        if (strcmp(tmp, str) == 0)
+        if (found_str == TRUE)
         {
-            if ((tmp = strtok(NULL, " \n\t\r")) == COMMA)
+            if (!isspace(content[i]) && content[i] == COMMA)
                 return;
-            else
+            else if (isspace(content[i]))
             {
-                set_error_type(NO_COMMA_FOUND);
-                return;
+                i++;
+                continue;
             }
+            else
+                break;
         }
-        else if (tmp == NULL)
-            return;
+        if (isspace(content[i]))
+        {
+            i++;
+            j = 1;
+            if (strlen(buffer) != 0)
+                memset(buffer, 0, BUFFER_SIZE);
+            continue;
+        }
+        else
+        {
+            buffer[j - 1] = content[i];
+            buffer[j] = '\0';
+            if (strcmp(buffer, str) == 0)
+                found_str = TRUE;
+            j++;
+            i++;
+            continue;
+        }
     }
+    set_error_type(NO_COMMA_FOUND);
 }
 
 int check_method_type(char *arg, unsigned int type)
@@ -155,7 +173,7 @@ int check_method_type(char *arg, unsigned int type)
     }
 }
 
-void create_off_to_instruction_pointer(char *src, char *dst)
+void create_offset_to_instruction_pointer(char *src, char *dst)
 {
     int src_val = -1;
     int dst_val;
@@ -203,7 +221,7 @@ void create_off_to_instruction_pointer(char *src, char *dst)
     }
 }
 
-void handle_instruction_type(char *content)
+void handle_instruction_type(char *content, List *symbol_table)
 {
     char *instruction;
     char *src = NULL;
@@ -220,7 +238,7 @@ void handle_instruction_type(char *content)
     strcpy(tmp, content);
     
     instruction = strtok(tmp, TOKENS);
-    if (is_end_with(instruction, SYMBOL_TERMINATE_CHARACTER) == TRUE)
+    if (is_end_with(instruction, COLON) == TRUE)
         instruction = strtok(NULL, TOKENS);
     
     if (get_instruction(instruction, it) == FALSE)
@@ -230,7 +248,15 @@ void handle_instruction_type(char *content)
     }
     update_instruction_code(&instruction_code, it->value, INSTRUCTION_SHIFTS);
     if (it->max_args == 0)
+    {
+        if (strtok(NULL, TOKENS) != NULL)
+        {
+            set_error_type(TO_MANY_ARGUEMNTS);
+            return;
+        }
+        add_instruction_to_memory(instruction_code);
         return;
+    }
 
     if (it->addr_src_support != 0)
     {
@@ -246,7 +272,7 @@ void handle_instruction_type(char *content)
     update_instruction_code(&instruction_code, instruction_value, DST_ARG_SHIFT);
 
     add_instruction_to_memory(instruction_code);
-    create_off_to_instruction_pointer(src, dst);
+    create_offset_to_instruction_pointer(src, dst);
 }
 
 void handle_string_structure_type(FieldType type, char *content, int pos)
@@ -384,7 +410,7 @@ int check_symbol_name(void *current_symbol, void *orig_symbol)
     return 1;
 }
 
-void update_symbol_address(Symbol *symbol, int type, List *symbol_table)
+void update_symbol_address(Symbol *symbol, FieldType type, List *symbol_table)
 {
     Symbol *s = (Symbol *)get_head_element(symbol_table);
     while (s != NULL)
@@ -393,9 +419,10 @@ void update_symbol_address(Symbol *symbol, int type, List *symbol_table)
         {
             s->type = type;
             if (type == INSTRUCTION)
-                s->declared_address = instruction_counter;
+                s->start_memory_index = instruction_counter;
             else
-                s->declared_address = data_counter;
+                s->start_memory_index = data_counter;
+            s->declared_address = instruction_counter + data_counter + ADDR_OFFSET;
             return;
         }
         s = (Symbol *)get_next_element(symbol_table);
@@ -421,14 +448,12 @@ void handle_symbol(Symbol *symbol, List *symbol_table)
 {
     if (validate_symbol(symbol->symbol_name) == FALSE)
         return;
-
-    remove_last_char(symbol->symbol_name);
     add_symbol_to_table(symbol, symbol_table);
 }
 
 Bool is_a_symbol(char *str, int pos)
 {
-    if (is_end_with(str, SYMBOL_TERMINATE_CHARACTER) == TRUE && pos == SYMBOL_DECLARATION_POS)
+    if (is_end_with(str, COLON) == TRUE && pos == SYMBOL_DECLARATION_POS)
         return TRUE;
     return FALSE;
 }
@@ -447,6 +472,7 @@ void read_line(char *content, List *symbol_table)
     if (is_a_symbol(str, str_pos) == TRUE)
     {
         is_symbol = TRUE;
+        remove_last_char(str);
         symbol = create_symbol_type(str, 0, UNKNOWN);
         handle_symbol(symbol, symbol_table);
         if (get_error() == TRUE)
@@ -473,18 +499,27 @@ void read_line(char *content, List *symbol_table)
         
         if (is_symbol == TRUE)
             update_symbol_address(symbol, INSTRUCTION, symbol_table);
-        handle_instruction_type(content);
+        handle_instruction_type(content, symbol_table);
     }
     else
         set_error_type(UNKNOWN_DECLARED_STR);
     return;
 }
 
-Bool start_first_stage(File *file)
+void print_memory(MemoryCell memory[], MemoryCell counter)
+{
+    int i;
+    for (i = 0; i < counter; i++)
+    {
+        printf("%x, ", memory[i]);
+    }
+    printf("\n");
+}
+
+Bool start_first_stage(File *file, List *symbol_table)
 {
     unsigned int line_number = 1;
     char *line_content = (char *)malloc(LINE_BUFFER_SIZE);
-    List *symbol_table = create_list();
     FILE *fp = fopen(file->file_name, "r");
 
     data_counter = 0;
@@ -496,10 +531,14 @@ Bool start_first_stage(File *file)
         if (get_error() == TRUE)
         {
             declare_an_error(get_error_type(), line_number);
+            if (is_list_empty(symbol_table) == FALSE)
+                delete_list(symbol_table);
             return FALSE;
         }
         line_number++;
     }
+    print_memory(instruction_storage, instruction_counter);
+    print_memory(data_storage, data_counter);
     fclose(fp);
     return TRUE;
 }

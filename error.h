@@ -17,6 +17,7 @@ typedef enum error_value{
     FOUND_ARGS_FOR_NONE_INST_ARG,
     UNSUPPORTED_ADDR_METHOD,
     NO_COMMA_FOUND,
+    TO_MANY_ARGUEMNTS,
     NONE
 }ErrorValue;
 

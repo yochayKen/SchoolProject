@@ -17,6 +17,7 @@ Bool check_file_extension(char *);
 char *skip_whitespaces(char *);
 char *get_nth_substring(char *, int);
 void remove_last_char(char *);
+void remove_first_char(char *);
 char get_last_char(char *);
 char get_first_char(char *);
 Bool is_start_with(const char *, char);

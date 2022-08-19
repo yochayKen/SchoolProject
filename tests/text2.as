@@ -1,7 +1,7 @@
 ;this is a commant
 .extern   W
 .extern   BLA
-.entry   K
+.entry   C
 MAIN:     mov S1.1, LENGTH
           add r2,STR
           macro m2
@@ -12,7 +12,7 @@ MAIN:     mov S1.1, LENGTH
 LOOP:     jmp END
           prn #-5
           sub r1,r4
-          inc k
+          inc C
           m2
           macro m1
           dec r1
