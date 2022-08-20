@@ -11,6 +11,7 @@ MAIN:     mov S1.1, LENGTH
           prn r7
 LOOP:     jmp END
           prn #-5
+          prn STR.1
           sub r1,r4
           inc C
           m2
