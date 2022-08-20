@@ -1,6 +1,5 @@
 ;this is commant
 .entry W
-.extern BLABLABLA
 MAIN:     mov S1.1 ,LENGTH
           add r2,STR
           prn r7
@@ -11,7 +10,6 @@ LOOP:     jmp END
           prn #7
           inc r1
           prn W
-          prn BLABLABLA
           mov S1.2 ,r3
           bne LOOP
 END:      hlt

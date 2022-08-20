@@ -70,11 +70,17 @@ int convert_char_to_int(char c)
 }
 
 /*Convert memory value into base 32 value*/
-char *convert_memory_value_to_machine_code(MemoryCell value)
+char *convert_memory_value_to_machine_code(int value)
 {
     char *machine_code = (char *)malloc(NUM_OF_BYTES_TO_MACHINE_CODE);
     int high_value = value / BASE_32;
     int low_value = value % BASE_32;
+
+    if (value < 0)
+    {
+        high_value = (value & 0x3e0) / BASE_32; /*0x3e0 => doing masking on high 5 bits*/
+        low_value = (value & 0x1f) % BASE_32; /*0x1f => doing masking on low 5 bits*/
+    }
 
     machine_code[0] = get_encode_base_32(high_value);
     machine_code[1] = get_encode_base_32(low_value);
@@ -150,6 +156,7 @@ void add_symbol_to_special_table(Symbol *s)
         append_to_list(entry_table, (void *)ss);
 }
 
+/*Add symbol address into a memory. Also checks the ARE bits*/
 void add_symbol_to_memory(MemoryCell memory_value, int tmp_value, char *src_operand, List *symbol_table)
 {
     Symbol *s;
@@ -177,6 +184,7 @@ void add_constant_to_memory(MemoryCell memory_value, char *operand)
     memory[instruction_counter++] = memory_value;
 }
 
+/**/
 void add_referenced_symbol_value(MemoryCell memory_value, char *operand, List *symbol_table)
 {
     int tmp_val;
@@ -291,6 +299,7 @@ void handle_src_operand(char *src_operand, List *symbol_table)
         add_referenced_symbol_value(memory_value, src_operand, symbol_table);
 }
 
+/*Handle all the arguments after the command*/
 void handle_arguments(List *symbol_table)
 {
     char *src_operand = strtok(NULL, TOKENS);
@@ -333,7 +342,7 @@ int get_data_offset(Symbol *s, List *symbol_table)
     return 0;
 }
 
-/**/
+/*Handling symbol definition and add its data into the memory*/
 Bool handle_symbol_definition(char *str, List *symbol_table)
 {
     Symbol *s;
@@ -395,7 +404,7 @@ void handle_line(char *line_content, List *symbol_table)
         
     else if (is_instruction(instruction) == TRUE)
     {
-        memory[instruction_counter] = instruction_storage[instruction_counter]; /*Issue*/
+        memory[instruction_counter] = instruction_storage[instruction_counter - data_counter]; /*Issue*/
         instruction_counter++;
     }
     handle_arguments(symbol_table);
@@ -471,22 +480,6 @@ void create_object_file(File *file)
     fclose(fp);
 }
 
-void print_table(void *s)
-{
-    SpecialSymbol *sm = (SpecialSymbol *)s;
-    printf("symbol named: %s is at %d address\n", sm->symbol_name, sm->address);
-}
-
-void print_memory_cells()
-{
-    int i;
-    for (i = 0; i < MEMORY_SIZE; i++)
-    {
-        printf("%x, ", memory[i]);
-    }
-    printf("\n");
-}
-
 /*Starting the second stage to complete the entry, extern and the object files*/
 void start_second_stage(File *file, List *symbol_table)
 {
@@ -503,7 +496,6 @@ void start_second_stage(File *file, List *symbol_table)
     {
         handle_line(line_content, symbol_table);
     }
-    print_memory_cells();
     create_extern_file(file);
     create_entry_file(file);
     create_object_file(file);

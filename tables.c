@@ -46,6 +46,7 @@ static VarType struct_table[] = {
     {".extern", EXTERN}, {".entry", ENTRY}
 };
 
+/*Get character presenting the base 32 value*/
 char get_encode_base_32(int num)
 {
     int i;
@@ -57,6 +58,7 @@ char get_encode_base_32(int num)
     return '\0';
 }
 
+/*Searching a string in a given table*/
 int search_in_table(char *str, TableType type)
 {
     int i, table_size;
@@ -82,6 +84,7 @@ int search_in_table(char *str, TableType type)
     return -1;
 }
 
+/*Retrieve instruction value from a table*/
 int get_instruction_value(char *str)
 {
     int i;
@@ -93,6 +96,7 @@ int get_instruction_value(char *str)
     return -1;
 }
 
+/*Check if instruction exists in the table*/
 Bool get_instruction(char *str, InstructionType *it)
 {
     int i;
@@ -107,11 +111,13 @@ Bool get_instruction(char *str, InstructionType *it)
     return FALSE;
 }
 
+/*Get register value from a table*/
 int get_register_value(char *str)
 {
     return search_in_table(str, REGISTER_T);
 }
 
+/*Get struct value from a table*/
 int get_struct_value(char *str)
 {
     return search_in_table(str, STRUCT_T);

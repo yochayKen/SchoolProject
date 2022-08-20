@@ -34,6 +34,7 @@ int validate_num_of_arguments(int num_of_args, char *name_of_file)
     return FALSE;
 }
 
+/*Running through all the files given as an argument*/
 void start_run_through_files(int argc, char *argv[])
 {
     int i;

@@ -92,12 +92,14 @@ void *search_in_list(List *list, void *data, int(* func_ptr)(void *, void *))
     return result;
 }
 
+/*Get the head element fron the list*/
 void *get_head_element(List *list)
 {
     list->current_element_addr = list->head;
     return list->current_element_addr->data;
 }
 
+/*Get the next element from the list*/
 void *get_next_element(List *list)
 {
     list->current_element_addr = list->current_element_addr->next;
@@ -109,11 +111,13 @@ void *get_next_element(List *list)
     return list->current_element_addr->data;
 }
 
+/*Get the current element in the list*/
 Node *get_current_element_addr(List *list)
 {
     return list->current_element_addr;
 }
 
+/*Checking the next element in the list*/
 void *check_next_element_in_list(List *list)
 {
     Node *nptr = list->current_element_addr;
@@ -122,6 +126,7 @@ void *check_next_element_in_list(List *list)
     return nptr->next->data;
 }
 
+/*Add sublist into a list*/
 void insert_sublist_in_list(Node *current_node, List *sub_list)
 {
     Node *nptr = current_node;
@@ -130,6 +135,7 @@ void insert_sublist_in_list(Node *current_node, List *sub_list)
     sub_list->tail->next = tmp;
 }
 
+/*Count number of element in list*/
 int count_list(List *list)
 {
     Node *nptr = list->head;
@@ -143,6 +149,7 @@ int count_list(List *list)
     return num_of_lines;
 }
 
+/*Checking if a given list is empty*/
 Bool is_list_empty(List *list)
 {
     if (list->head == NULL)

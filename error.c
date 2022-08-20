@@ -28,6 +28,7 @@ static const Error error_table[] = {
     {NO_COMMA_FOUND, "Missimg comma between commands"}
 };
 
+/*Declaring an error to stdout*/
 void declare_an_error(ErrorValue error_value, unsigned int line_number)
 {
     int i;
@@ -40,22 +41,26 @@ void declare_an_error(ErrorValue error_value, unsigned int line_number)
     }
 }
 
+/*Get error flag value*/
 Bool get_error()
 {
     return error_flag;
 }
 
+/*Set error flag value*/
 void set_error_type(ErrorValue ev)
 {
     error_flag = TRUE;
     error_value = ev;
 }
 
+/*Get error type*/
 ErrorValue get_error_type()
 {
     return error_value;
 }
 
+/*Point to the file name we are working on*/
 void update_current_file_name(char *file_name)
 {
     current_file_name = file_name;

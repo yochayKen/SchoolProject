@@ -35,61 +35,72 @@ typedef enum{
     DST
 }ArgType;
 
+/*Return the value of data counter*/
 MemoryCell get_data_counter()
 {
     return data_counter;
 }
 
+/*Returning reference to data storage*/
 MemoryCell *get_data_storage()
 {
     return data_storage;
 }
 
+/*Return a reference to instruction storage*/
 MemoryCell *get_instruction_storage()
 {
     return instruction_storage;
 }
 
+/*Checks if a string is a struct*/
 int is_a_struct(char *str)
 {
     return get_struct_value(str);
 }
 
+/*Checking if string is an instruction*/
 int is_an_instruction(char *str)
 {
     return get_instruction_value(str);
 }
 
+/*Add number into the memory*/
 void add_number_to_memory(int number)
 {
     data_storage[data_counter++] = number;
     data_storage[data_counter] = '\0';
 }
 
+/*Add character into the memory*/
 void add_char_to_memory(unsigned char character)
 {
     data_storage[data_counter++] = character;
     data_storage[data_counter] = '\0';
 }
 
+/*Put instruction into a memory*/
 void add_instruction_to_memory(unsigned int data)
 {
     instruction_storage[instruction_counter++] = data;
     instruction_storage[instruction_counter] = '\0';
 }
 
+/*updating instruction code in a memory value*/
 void update_instruction_code(unsigned int *instruction_code, unsigned int instruction_value, int offset)
 {
     instruction_value <<= offset;
     *instruction_code |= instruction_value;
 }
 
+/*validate if the method is supported*/
 void validate_address_method_support(unsigned int address_method_options, AddrMethod method)
 {
     if ((address_method_options & method) == 0)
         set_error_type(UNSUPPORTED_ADDR_METHOD);
 }
 
+/*Create symbol type*/
 Symbol *create_symbol_type(char *symbol_name, unsigned int address, FieldType type)
 {
     Symbol *s = (Symbol *)malloc(sizeof(Symbol));
@@ -99,6 +110,7 @@ Symbol *create_symbol_type(char *symbol_name, unsigned int address, FieldType ty
     return s;
 }
 
+/*checking if its record declaration*/
 Bool is_record_declaration(char *str)
 {
     if (strchr(str, DOT) != NULL && is_start_with(str, DOT) == FALSE)
@@ -106,6 +118,7 @@ Bool is_record_declaration(char *str)
     return FALSE;
 }
 
+/*Checking if comma exists inside the string*/
 void check_for_comma(char *content, char *str)
 {
     char *buffer = (char *)malloc(BUFFER_SIZE);
@@ -149,6 +162,7 @@ void check_for_comma(char *content, char *str)
     set_error_type(NO_COMMA_FOUND);
 }
 
+/*Checking the method type and validate its type*/
 int check_method_type(char *arg, unsigned int type)
 {
     if (is_start_with(arg, HASH) == TRUE)
@@ -173,6 +187,7 @@ int check_method_type(char *arg, unsigned int type)
     }
 }
 
+/*Creating an offset between an instrucion to its arguments in the memory*/
 void create_offset_to_instruction_pointer(char *src, char *dst)
 {
     int src_val = -1;
@@ -221,6 +236,7 @@ void create_offset_to_instruction_pointer(char *src, char *dst)
     }
 }
 
+/*Handling instruction by getting its all arguments*/
 void handle_instruction_type(char *content, List *symbol_table)
 {
     char *instruction;
@@ -275,6 +291,7 @@ void handle_instruction_type(char *content, List *symbol_table)
     create_offset_to_instruction_pointer(src, dst);
 }
 
+/*Handle string structure and put its value into a data storage*/
 void handle_string_structure_type(FieldType type, char *content, int pos)
 {
     char *str;
@@ -304,6 +321,7 @@ void handle_string_structure_type(FieldType type, char *content, int pos)
     }
 }
 
+/*Handling symbol data type and put its data into a data storage*/
 void handle_data_structure_type(FieldType type, char *content, int pos)
 {
     char *str;
@@ -326,6 +344,7 @@ void handle_data_structure_type(FieldType type, char *content, int pos)
     }
 }
 
+/*Adding symbol into the symbol table*/
 void add_symbol_to_table(Symbol *symbol, List *symbol_table)
 {
     Symbol *tmp;
@@ -351,6 +370,7 @@ void add_symbol_to_table(Symbol *symbol, List *symbol_table)
     append_to_list(symbol_table, (void *)current_symbol);
 }
 
+/*Handling struct type symbol*/
 void handle_struct_structure_type(char *content, int pos)
 {
     char *str;
@@ -370,6 +390,7 @@ void handle_struct_structure_type(char *content, int pos)
     }
 }
 
+/*Handling extern symbol type*/
 void handle_extern_symbol(char *content, int pos, List *symbol_table)
 {
     char *str = get_nth_substring(content, ++pos);
@@ -377,6 +398,7 @@ void handle_extern_symbol(char *content, int pos, List *symbol_table)
     add_symbol_to_table(ext_symbol, symbol_table);
 }
 
+/*Checking a struct type by a symbol type field*/
 void handle_struct_type(FieldType type, char *content, int pos, List *symbol_table)
 {
     switch (type)
@@ -400,6 +422,7 @@ void handle_struct_type(FieldType type, char *content, int pos, List *symbol_tab
     }
 }
 
+/*Checking if symbols has the same name*/
 int check_symbol_name(void *current_symbol, void *orig_symbol)
 {
     Symbol *s1 = (Symbol *)current_symbol;
@@ -410,6 +433,7 @@ int check_symbol_name(void *current_symbol, void *orig_symbol)
     return 1;
 }
 
+/*updating symbol declaration memory address*/
 void update_symbol_address(Symbol *symbol, FieldType type, List *symbol_table)
 {
     Symbol *s = (Symbol *)get_head_element(symbol_table);
@@ -429,11 +453,13 @@ void update_symbol_address(Symbol *symbol, FieldType type, List *symbol_table)
     }
 }
 
+/*Removing a symbol from a table*/
 void remove_symbol_from_table(Symbol *symbol, List *symbol_table)
 {
     remove_from_list(symbol_table, (void *)symbol, check_symbol_name);
 }
 
+/*Symbol validator*/
 Bool validate_symbol(char *symbol_name)
 {
     char c = get_first_char(symbol_name);
@@ -444,6 +470,7 @@ Bool validate_symbol(char *symbol_name)
     return FALSE;
 }
 
+/*Handling a symbol - validate and adding into a table*/
 void handle_symbol(Symbol *symbol, List *symbol_table)
 {
     if (validate_symbol(symbol->symbol_name) == FALSE)
@@ -451,6 +478,7 @@ void handle_symbol(Symbol *symbol, List *symbol_table)
     add_symbol_to_table(symbol, symbol_table);
 }
 
+/*Checking is a string is a symbol*/
 Bool is_a_symbol(char *str, int pos)
 {
     if (is_end_with(str, COLON) == TRUE && pos == SYMBOL_DECLARATION_POS)
@@ -458,6 +486,7 @@ Bool is_a_symbol(char *str, int pos)
     return FALSE;
 }
 
+/*Handle a single line of instructions*/
 void read_line(char *content, List *symbol_table)
 {
     int struct_type, instruction_type, str_pos = 1;
@@ -506,16 +535,7 @@ void read_line(char *content, List *symbol_table)
     return;
 }
 
-void print_memory(MemoryCell memory[], MemoryCell counter)
-{
-    int i;
-    for (i = 0; i < counter; i++)
-    {
-        printf("%x, ", memory[i]);
-    }
-    printf("\n");
-}
-
+/*Starting first stage. Creating the instruction memory values and looking for symbols declerations*/
 Bool start_first_stage(File *file, List *symbol_table)
 {
     unsigned int line_number = 1;
@@ -537,8 +557,6 @@ Bool start_first_stage(File *file, List *symbol_table)
         }
         line_number++;
     }
-    print_memory(instruction_storage, instruction_counter);
-    print_memory(data_storage, data_counter);
     fclose(fp);
     return TRUE;
 }

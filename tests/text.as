@@ -19,7 +19,6 @@ LOOP:     jmp END
           inc K
           m2
           prn W
-          prn BLABLABLA
           mov S1.2 ,r3
           bne LOOP
 END:      hlt

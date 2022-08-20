@@ -21,6 +21,7 @@ typedef struct macro_info{
     List *command_lines;
 }MacroInfo;
 
+/*Creating a macro struct*/
 MacroInfo *create_macro_instance(char *macro_name, unsigned int line)
 {
     MacroInfo *macro = (MacroInfo *) malloc(sizeof (MacroInfo));
@@ -30,6 +31,7 @@ MacroInfo *create_macro_instance(char *macro_name, unsigned int line)
     return macro;
 }
 
+/*Comparing lines by checking the macros*/
 int compare_macro_lines(void *line_info, void *current_line_info)
 {
     LineInfo *li = (LineInfo *)line_info;
@@ -39,6 +41,7 @@ int compare_macro_lines(void *line_info, void *current_line_info)
     return 1;
 }
 
+/*Validating the macro decleration*/
 Bool validate_macros_decleration(List *file_content_linst, List *macros)
 {
     LineInfo *line_info = (LineInfo *) get_head_element(file_content_linst);
@@ -63,6 +66,7 @@ Bool validate_macros_decleration(List *file_content_linst, List *macros)
     return TRUE;
 }
 
+/*Convert macro decleration into a list of lines and insert it in the right order*/
 void convert_macro_declerations(List *file_content_list, List *macros)
 {
     MacroInfo *macro_info = (MacroInfo *) get_head_element(macros);
@@ -90,11 +94,13 @@ void convert_macro_declerations(List *file_content_list, List *macros)
     }
 }
 
+/*Get macro name from a given line*/
 char *get_macro_name(char *line)
 {
     return get_nth_substring(line, MACRO_NAME_ARG_POSITION);
 }
 
+/*Searching for a macro in a list*/
 List *search_for_macros(List *file_content_list)
 {
     int is_macro = 0;
@@ -136,6 +142,7 @@ List *search_for_macros(List *file_content_list)
     return macros;
 }
 
+/*Starting preprocessing stage. Converting all macros into their commands*/
 Bool start_preprocess_stage(File *file)
 {
     List *file_content_list = convert_file_lines_to_list(file);

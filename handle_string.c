@@ -11,6 +11,7 @@
 #define EXTENSION_CHARS 3
 #define EXTENSION "as"
 
+/*Init a line info struct containing info about a line*/
 LineInfo *init_line_info(char *line, unsigned int line_number, unsigned int num_of_chars)
 {
     LineInfo *line_info = (LineInfo *) malloc(sizeof (LineInfo));
@@ -20,6 +21,7 @@ LineInfo *init_line_info(char *line, unsigned int line_number, unsigned int num_
     return line_info;
 }
 
+/*Checking file extension validation*/
 Bool check_file_extension(char *file_name)
 {
     char buffer[EXTENSION_CHARS];
@@ -40,6 +42,7 @@ Bool check_file_extension(char *file_name)
     return FALSE;
 }
 
+/*Changing a file extensiom after the '.'*/
 char *change_file_extension(char *current_file_name, char *file_extension)
 {
     char *str = (char *)malloc(strlen(current_file_name) + 1);
@@ -63,6 +66,7 @@ char *change_file_extension(char *current_file_name, char *file_extension)
     return str;
 }
 
+/*Skipping white spaces from a given string.*/
 char *skip_whitespaces(char *str)
 {
     int i = 0;
@@ -71,6 +75,7 @@ char *skip_whitespaces(char *str)
     return str + i;
 }
 
+/*Getting the nth string position of from a given string (Like strtok but not destructive)*/
 char *get_nth_substring(char *str, int n)
 {
     int i = 0, j = 1, num_of_strs = 0;
@@ -106,28 +111,33 @@ char *get_nth_substring(char *str, int n)
     return NULL;
 }
 
+/*Removing last character from a given string*/
 void remove_last_char(char *str)
 {
     int str_len = strlen(str);
     str[str_len - 1] = '\0';
 }
 
+/*Remove first character from a given string*/
 void remove_first_char(char *str)
 {
-    str = str++;
+    memcpy(str, str + 1, strlen(str));
 }
 
+/*Retrieve last character from a given string*/
 char get_last_char(char *str)
 {
     int str_len = strlen(str);
     return str[str_len - 1];
 }
 
+/*Get first character from a given string*/
 char get_first_char(char *str)
 {
     return str[0];
 }
 
+/*Check if string start with character prefix*/
 Bool is_start_with(const char *str, char prefix)
 {
     if (str[0] == prefix)
@@ -135,6 +145,7 @@ Bool is_start_with(const char *str, char prefix)
     return FALSE;
 }
 
+/*Check if string ends with character postfix*/
 Bool is_end_with(const char *str, char postfix)
 {
     size_t str_len = strlen(str);
@@ -143,6 +154,7 @@ Bool is_end_with(const char *str, char postfix)
     return FALSE;
 }
 
+/*Checks if string exists in a given string*/
 Bool is_word_exists(const char *line,const char *word)
 {
     char *ret;
@@ -153,6 +165,7 @@ Bool is_word_exists(const char *line,const char *word)
     return FALSE;
 }
 
+/*Converting file lines into list. Every individual line becomes to a element in a list*/
 List *convert_file_lines_to_list(File *file)
 {
     List *line_list = create_list();
@@ -172,6 +185,7 @@ List *convert_file_lines_to_list(File *file)
     return line_list;
 }
 
+/*Convert each element in list containing a string into a file. Each element its a row in the file*/
 char *convert_list_to_file_lines(List *file_content_list)
 {
     LineInfo *line_info = (LineInfo *) get_head_element(file_content_list);
