@@ -14,6 +14,7 @@ typedef struct line_info{
 /*=== API ===*/
 LineInfo *get_line(const char *, unsigned int);
 Bool check_file_extension(char *);
+char *change_file_extension(char *, char *);
 char *skip_whitespaces(char *);
 char *get_nth_substring(char *, int);
 void remove_last_char(char *);

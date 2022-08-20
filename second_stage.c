@@ -15,7 +15,6 @@ typedef enum{
 
 typedef struct special_symbol{
     char *symbol_name;
-    FieldType type;
     MemoryCell address;
 }SpecialSymbol;
 
@@ -24,10 +23,15 @@ typedef struct special_symbol{
 #define SHIFT_FIRST_REGISTER 6
 #define SHIFT_SECOND_REGISTER 2
 #define SHIFT_NUMBER 2
+#define BASE_32 32
+#define NUM_OF_BYTES_TO_MACHINE_CODE 3
 #define SRC_OPERAND_VAL 0x30
 #define DST_OPERAND_VAL 0xc
 
 #define ENTRY_SYMBOL ".entry"
+#define ENTRY_EXTENSION "ent"
+#define EXTERN_EXTENSION "ext"
+#define OBJECT_EXTENSION "obj"
 
 static MemoryCell instruction_counter = 0;
 static MemoryCell data_counter = 0;
@@ -36,7 +40,8 @@ static MemoryCell memory[MEMORY_SIZE];
 static MemoryCell *instruction_storage;
 static MemoryCell *data_storage;
 
-static List *special_symbol_table;
+static List *extern_table;
+static List *entry_table;
 
 /*
 Checking if the string is assembly instruction. 
@@ -64,12 +69,24 @@ int convert_char_to_int(char c)
     return (c - '0');
 }
 
+/*Convert memory value into base 32 value*/
+char *convert_memory_value_to_machine_code(MemoryCell value)
+{
+    char *machine_code = (char *)malloc(NUM_OF_BYTES_TO_MACHINE_CODE);
+    int high_value = value / BASE_32;
+    int low_value = value % BASE_32;
+
+    machine_code[0] = get_encode_base_32(high_value);
+    machine_code[1] = get_encode_base_32(low_value);
+    machine_code[2] = '\0';
+    return machine_code;
+}
+
 /*Creating sepical symbol for entry and extern table*/
 SpecialSymbol *create_special_symbol(Symbol *s)
 {
     SpecialSymbol *ss = (SpecialSymbol *)malloc(sizeof(SpecialSymbol));
     ss->symbol_name = s->symbol_name;
-    ss->type = s->type;
     ss->address = instruction_counter + MEMORY_ADDRESS_OFFSET;
     return ss;
 }
@@ -127,7 +144,10 @@ char *get_symbol_name(char *str)
 void add_symbol_to_special_table(Symbol *s)
 {
     SpecialSymbol *ss = create_special_symbol(s);
-    append_to_list(special_symbol_table, (void *)ss);
+    if (s->type == EXTERN)
+        append_to_list(extern_table, (void *)ss);
+    else
+        append_to_list(entry_table, (void *)ss);
 }
 
 void add_symbol_to_memory(MemoryCell memory_value, int tmp_value, char *src_operand, List *symbol_table)
@@ -375,28 +395,80 @@ void handle_line(char *line_content, List *symbol_table)
         
     else if (is_instruction(instruction) == TRUE)
     {
-        memory[instruction_counter] = instruction_storage[instruction_counter];
+        memory[instruction_counter] = instruction_storage[instruction_counter]; /*Issue*/
         instruction_counter++;
     }
     handle_arguments(symbol_table);
 }
 
 /*Creating the entry file. If not entry exists, will not produce one*/
-void create_entry_file(List *symbol_table)
+void create_entry_file(File *file)
 {
-    return;
+    char *new_file_name;
+    char *base_32_convertion;
+    FILE *fp;
+    SpecialSymbol *ss;
+    
+    if (is_list_empty(entry_table) == TRUE)
+        return;
+
+    ss = (SpecialSymbol *)get_head_element(entry_table);
+    new_file_name = change_file_extension(file->file_name, ENTRY_EXTENSION);
+    fp = fopen(new_file_name, "w");
+
+    while (ss != NULL)
+    {
+        base_32_convertion = convert_memory_value_to_machine_code(ss->address);
+        fprintf(fp, "%s\t%s\n", ss->symbol_name, base_32_convertion);
+        ss = (SpecialSymbol *)get_next_element(entry_table);
+    }
+    fclose(fp);
 }
 
 /*Creating the extern file. If not extern exists, will not produce one*/
-void create_extern_file(List *symbol_table)
+void create_extern_file(File *file)
 {
-    return;
+    char *new_file_name;
+    char *base_32_convertion;
+    FILE *fp;
+    SpecialSymbol *ss;
+    
+    if (is_list_empty(extern_table) == TRUE)
+        return;
+
+    ss = (SpecialSymbol *)get_head_element(extern_table);
+    new_file_name = change_file_extension(file->file_name, EXTERN_EXTENSION);
+    fp = fopen(new_file_name, "w");
+
+    while (ss != NULL)
+    {
+        base_32_convertion = convert_memory_value_to_machine_code(ss->address);
+        fprintf(fp, "%s\t%s\n", ss->symbol_name, base_32_convertion);
+        ss = (SpecialSymbol *)get_next_element(extern_table);
+    }
+    fclose(fp);
 }
 
 /*Creating the object file of the assembler code*/
-void create_object_file()
+void create_object_file(File *file)
 {
-    return;
+    char *new_file_name;
+    char *base_32_instruction;
+    char *base_32_address;
+    FILE *fp;
+    MemoryCell memory_address_value = MEMORY_ADDRESS_OFFSET;
+    int i;
+
+    new_file_name = change_file_extension(file->file_name, OBJECT_EXTENSION);
+    fp = fopen(new_file_name, "w");
+    for (i = 0; i < instruction_counter; i++)
+    {
+        base_32_instruction = convert_memory_value_to_machine_code(memory[i]);
+        base_32_address = convert_memory_value_to_machine_code(memory_address_value);
+        fprintf(fp, "%s\t%s\n", base_32_address, base_32_instruction);
+        memory_address_value++;
+    }
+    fclose(fp);
 }
 
 void print_table(void *s)
@@ -424,12 +496,15 @@ void start_second_stage(File *file, List *symbol_table)
     instruction_storage = get_instruction_storage();
     data_storage = get_data_storage();
 
-    special_symbol_table = create_list();
+    extern_table = create_list();
+    entry_table = create_list();
 
     while (fgets(line_content, LINE_BUFFER_SIZE, fp) != NULL)
     {
         handle_line(line_content, symbol_table);
     }
-    print_list(special_symbol_table, print_table);
     print_memory_cells();
+    create_extern_file(file);
+    create_entry_file(file);
+    create_object_file(file);
 }

@@ -1,3 +1,5 @@
+;this is commant
+.entry W
 MAIN:     mov S1.1 ,LENGTH
           add r2,STR
           macro m2
@@ -14,8 +16,10 @@ MAIN:     mov S1.1 ,LENGTH
 LOOP:     jmp END
           prn #-5
           sub r1,r4
-          inc k
+          inc K
           m2
+          prn W
+          prn BLABLABLA
           mov S1.2 ,r3
           bne LOOP
 END:      hlt

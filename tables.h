@@ -14,6 +14,7 @@ typedef struct instruction{
 int get_struct_value(char *);
 int get_instruction_value(char *);
 int get_register_value(char *);
+char get_encode_base_32(int);
 
 Bool get_instruction(char *, InstructionType *);
 

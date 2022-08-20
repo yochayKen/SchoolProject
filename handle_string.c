@@ -40,6 +40,29 @@ Bool check_file_extension(char *file_name)
     return FALSE;
 }
 
+char *change_file_extension(char *current_file_name, char *file_extension)
+{
+    char *str = (char *)malloc(strlen(current_file_name) + 1);
+    int i = 0, j = 0 ;
+    while (current_file_name[i] != '\0')
+    {
+        str[i] = current_file_name[i];
+        if (current_file_name[i] == '.')
+        {
+            i++;
+            while (file_extension[j] != '\0')
+            {
+                str[i] = file_extension[j];
+                i++;
+                j++;
+            }
+            break;
+        }
+        i++;
+    }
+    return str;
+}
+
 char *skip_whitespaces(char *str)
 {
     int i = 0;

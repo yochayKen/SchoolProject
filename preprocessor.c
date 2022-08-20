@@ -30,24 +30,6 @@ MacroInfo *create_macro_instance(char *macro_name, unsigned int line)
     return macro;
 }
 
-char *change_file_extension(char *current_file_name)
-{
-    char *str = (char *)malloc(strlen(current_file_name) + 1);
-    int i = 0;
-    while (current_file_name[i] != '\0')
-    {
-        str[i] = current_file_name[i];
-        if (current_file_name[i] == '.')
-        {
-            i++;
-            str = strcat(str, FILE_EXTENSION);
-            break;
-        }
-        i++;
-    }
-    return str;
-}
-
 int compare_macro_lines(void *line_info, void *current_line_info)
 {
     LineInfo *li = (LineInfo *)line_info;
@@ -167,7 +149,7 @@ Bool start_preprocess_stage(File *file)
     convert_macro_declerations(file_content_list, macros);
     free(file->file_content);
     file->num_of_lines = count_list(file_content_list);
-    file->file_name = change_file_extension(file->file_name);
+    file->file_name = change_file_extension(file->file_name, FILE_EXTENSION);
     file->file_content = convert_list_to_file_lines(file_content_list);
     return TRUE;
 }
